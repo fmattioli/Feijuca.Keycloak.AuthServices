@@ -2,7 +2,7 @@
 {
     public interface IAuthService
     {
-        int GetTenantFromToken();
+        string GetTenantFromToken();
         Guid GetUserFromToken();
     }
 }

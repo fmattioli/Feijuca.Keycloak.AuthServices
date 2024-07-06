@@ -8,12 +8,12 @@ namespace Feijuca.Keycloak.Services
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly JwtSecurityTokenHandler _tokenHandler = jwtSecurityTokenHandler;
 
-        public int GetTenantFromToken()
+        public string GetTenantFromToken()
         {
             string jwtToken = GetToken();
             var tokenInfos = _tokenHandler.ReadJwtToken(jwtToken);
             var tenantClaim = tokenInfos.Claims.FirstOrDefault(c => c.Type == "tenant")?.Value!;
-            return int.Parse(tenantClaim);
+            return tenantClaim;
         }
 
         public Guid GetUserFromToken()
