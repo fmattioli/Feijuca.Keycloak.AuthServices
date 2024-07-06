@@ -1,4 +1,4 @@
-﻿namespace Feijuca.Keycloak.Services.Models
+﻿namespace Feijuca.Keycloak.MultiTenancy.Services.Models
 {
     public record AuthSettings(string? ClientId, string? Resource, string? AuthServerUrl, string? PolicyName, IEnumerable<string>? Roles, IEnumerable<string>? Scopes)
     {

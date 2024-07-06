@@ -1,4 +1,4 @@
-﻿namespace Feijuca.Keycloak.Services
+﻿namespace Feijuca.Keycloak.MultiTenancy.Services
 {
     public interface IAuthService
     {

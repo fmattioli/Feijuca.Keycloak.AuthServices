@@ -5,10 +5,10 @@ using Keycloak.AuthServices.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Http;
-using Feijuca.Keycloak.Services;
-using Feijuca.Keycloak.Services.Models;
+using Feijuca.Keycloak.MultiTenancy.Services;
+using Feijuca.Keycloak.MultiTenancy.Services.Models;
 
-namespace Feijuca.Keycloak.Extensions
+namespace Feijuca.Keycloak.MultiTenancy.Extensions
 {
     public static class AuthExtensions
     {

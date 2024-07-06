@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
+
 using System.IdentityModel.Tokens.Jwt;
 
-namespace Feijuca.Keycloak.Services
+namespace Feijuca.Keycloak.MultiTenancy.Services
 {
     public class AuthService(IHttpContextAccessor httpContextAccessor, JwtSecurityTokenHandler jwtSecurityTokenHandler) : IAuthService
     {
