@@ -5,6 +5,8 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 This project has a quickly purpose: Extend the behavior of [keycloak-authorization-services-dotnet](https://nikiforovall.github.io/keycloak-authorization-services-dotnet/) but adding a multi-tenancy support.
+Maybe you are asking yourself, what is feijuca? Well... Feijuca is a nickname for a famous Brazilian dish called [Feijoada](https://theculturetrip.com/south-america/brazil/articles/a-brief-introduction-to-feijoada-brazils-national-dish). I wanted to use a name representing my country on this project and Feijuca was chosen.
+
 
 ## Motivation
 Keycloak may not be the best solution to work with multi-tenancy authentication, but we have the possibility of achieving this using the multi-realm context, basically we can have multi-realms within a keycloak instance and you can treat each realm as a tenant within your application.
