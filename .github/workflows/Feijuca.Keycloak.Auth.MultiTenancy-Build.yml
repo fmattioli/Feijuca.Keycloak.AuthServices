@@ -4,11 +4,11 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - 'src/Feijuca.Keycloak.MultiTenancyAuthServices/**'
+      - 'src/Feijuca.Keycloak.Auth.MultiTenancy/**'
   pull_request:
     branches: [ "main" ]
     paths:
-      - 'src/Feijuca.Keycloak.MultiTenancyAuthServices/**'
+      - 'src/Feijuca.Keycloak.Auth.MultiTenancy/**'
 
 env:
   VERSION_UPDATE_TYPE: "value"
