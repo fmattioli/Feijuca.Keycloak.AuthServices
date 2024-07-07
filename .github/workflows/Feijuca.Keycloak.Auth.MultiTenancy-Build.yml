@@ -107,7 +107,7 @@ jobs:
     env:
       VERSION: ${{ needs.bump.outputs.version }}
       VERSION_UPDATE_TYPE: ${{ needs.bump.outputs.version_update_type }}
-    if: github.ref == 'refs/heads/main' && (env.VERSION_UPDATE_TYPE == 'MINOR' || env.VERSION_UPDATE_TYPE == 'REVISION')
+    if: github.ref == 'refs/heads/main' && env.VERSION_UPDATE_TYPE == 'MINOR' || env.VERSION_UPDATE_TYPE == 'REVISION'
     name: Update NuGet package
     steps:
       - name: Checkout repository
