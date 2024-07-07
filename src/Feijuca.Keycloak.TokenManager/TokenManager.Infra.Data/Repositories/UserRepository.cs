@@ -11,54 +11,31 @@ using TokenManager.Infra.Data.Models;
 
 namespace TokenManager.Infra.Data.Repositories
 {
-    public class UserRepository(IHttpClientFactory httpClientFactory, IAuthService authService, TokenCredentials tokenCredentials) : IUserRepository
+    public class UserRepository : IUserRepository
     {
-        private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
-        private readonly IAuthService _authService = authService;
-        private readonly TokenCredentials _tokenCredentials = tokenCredentials;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IAuthService _authService;
+        private readonly TokenCredentials _tokenCredentials;
+        private readonly HttpClient _httpClient;
+
+        private string urlUserActions = "";
+
+        public UserRepository(IHttpClientFactory httpClientFactory, IAuthService authService, TokenCredentials tokenCredentials)
+        {
+            _httpClientFactory = httpClientFactory;
+            _authService = authService;
+            _tokenCredentials = tokenCredentials;
+            _httpClient = _httpClientFactory.CreateClient("KeycloakClient");
+        }
+
         private static readonly JsonSerializerSettings Settings = new()
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver(),
             NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore
         };
 
-        public async Task<Result> CreateUserAsync(string tenant, User user)
-        {
-            var tokenBearerResult = await GetAccessTokenAsync(tenant);
-            if (tokenBearerResult.IsSuccess)
-            {
-                var client = _httpClientFactory
-                    .CreateClient("KeycloakClient");
-
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenBearerResult.Value.Access_Token);
-
-                var url = client.BaseAddress
-                    .AppendPathSegment("admin")
-                    .AppendPathSegment("realms")
-                    .AppendPathSegment(tenant)
-                    .AppendPathSegment("users");
-
-                var json = JsonConvert.SerializeObject(user, Settings);
-                StringContent httpContent = new(json, Encoding.UTF8, "application/json");
-                var response = await client.PostAsync(url, httpContent);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return Result.Success();
-                }
-
-                var responseMessage = await response.Content.ReadAsStringAsync();
-                UserErrors.SetTechnicalMessage(responseMessage);
-                return Result.Failure(UserErrors.TokenGenerationError);
-            }
-
-            return Result.Failure(UserErrors.InvalidUserNameOrPasswordError);
-        }
-
         public async Task<Result<TokenDetails>> GetAccessTokenAsync(string tenant)
         {
-            var client = _httpClientFactory.CreateClient("KeycloakClient");
-
             var requestData = new FormUrlEncodedContent(
             [
                 new KeyValuePair<string, string>("grant_type", "client_credentials"),
@@ -66,14 +43,14 @@ namespace TokenManager.Infra.Data.Repositories
                 new KeyValuePair<string, string>("client_secret", _tokenCredentials.Client_Secret),
             ]);
 
-            var url = client.BaseAddress
+            var url = _httpClient.BaseAddress
                 .AppendPathSegment("realms")
                 .AppendPathSegment(tenant)
                 .AppendPathSegment("protocol")
                 .AppendPathSegment("openid-connect")
                 .AppendPathSegment("token");
 
-            var response = await client.PostAsync(url, requestData);
+            var response = await _httpClient.PostAsync(url, requestData);
 
             if (response.IsSuccessStatusCode)
             {
@@ -87,9 +64,59 @@ namespace TokenManager.Infra.Data.Repositories
             return Result<TokenDetails>.Failure(UserErrors.TokenGenerationError);
         }
 
+        public async Task<Result> DoNewUserCreationActions(string tenant, User user)
+        {
+            var tokenBearerResult = await GetAccessTokenAsync(tenant);
+            if (tokenBearerResult.IsSuccess)
+            {
+                ConfigureHttpClient(tenant, tokenBearerResult.Value.Access_Token);
+
+                var response = await CreateNewUserAsync(user);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var userName = await GetUserAsync(user.Username);
+                    return Result.Success();
+                }
+
+                var responseMessage = await response.Content.ReadAsStringAsync();
+                UserErrors.SetTechnicalMessage(responseMessage);
+                return Result.Failure(UserErrors.TokenGenerationError);
+            }
+
+            return Result.Failure(UserErrors.InvalidUserNameOrPasswordError);
+        }
+
+        private void ConfigureHttpClient(string tenant, string accessToken)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+            urlUserActions = _httpClient.BaseAddress
+                    .AppendPathSegment("admin")
+                    .AppendPathSegment("realms")
+                    .AppendPathSegment(tenant)
+                    .AppendPathSegment("users");
+        }
+
+        public async Task<HttpResponseMessage> CreateNewUserAsync(User user)
+        {
+            var json = JsonConvert.SerializeObject(user, Settings);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync(urlUserActions, httpContent);
+            return response;
+        }
+
+        public async Task<Result<User>> GetUserAsync(string userName)
+        {
+            var url = urlUserActions.SetQueryParam("username", userName);
+            var response = await _httpClient.GetAsync(url);
+            var keycloakUserContent = await response.Content.ReadAsStringAsync();
+
+            var user = JsonConvert.DeserializeObject<List<User>>(keycloakUserContent)!;
+            return Result<User>.Success(user[0]);
+        }
+
         public async Task<Result<TokenDetails>> LoginAsync(User user)
         {
-            var client = _httpClientFactory.CreateClient("KeycloakClient");
             var requestData = new FormUrlEncodedContent(
             [
                 new KeyValuePair<string, string>("grant_type", "password"),
@@ -102,14 +129,14 @@ namespace TokenManager.Infra.Data.Repositories
 
             var tenant = _authService.GetTenantFromToken();
 
-            var url = client.BaseAddress
+            var url = _httpClient.BaseAddress
                 .AppendPathSegment("realms")
                 .AppendPathSegment(tenant)
                 .AppendPathSegment("protocol")
                 .AppendPathSegment("openid-connect")
                 .AppendPathSegment("token");
 
-            var response = await client.PostAsync(url, requestData);
+            var response = await _httpClient.PostAsync(url, requestData);
 
             if (response.IsSuccessStatusCode)
             {
