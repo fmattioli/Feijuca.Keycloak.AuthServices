@@ -1,5 +1,6 @@
 using TokenManager.Infra.CrossCutting.Config;
 using TokenManager.Infra.CrossCutting.Extensions;
+using TokenManager.Infra.CrossCutting.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,8 @@ builder.Services.AddSingleton<ISettings>(applicationSettings);
 builder.Services.AddControllers();
 
 builder.Services
+    .AddExceptionHandler<GlobalExceptionHandler>()
+    .AddProblemDetails()
     .AddApiAuthentication(applicationSettings.AuthSettings)
     .AddLoggingDependency()
     .AddMediator()
@@ -25,19 +28,19 @@ builder.Services
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "TokenManager.Api");
-    c.OAuthClientId(applicationSettings!.AuthSettings!.Resource);
-    c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
-});
+app
+    .UseExceptionHandler()
+    .UseSwagger()
+    .UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "TokenManager.Api");
+        c.OAuthClientId(applicationSettings!.AuthSettings!.Resource);
+        c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
+    });
 
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
+app.UseHttpsRedirection()
+   .UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();
