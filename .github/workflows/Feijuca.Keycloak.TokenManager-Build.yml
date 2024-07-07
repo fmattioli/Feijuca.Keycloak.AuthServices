@@ -5,10 +5,12 @@ on:
     branches: [ "main" ]
     paths:
       - 'src/Feijuca.Keycloak.TokenManager/**'
+      - 'tests/**'
   pull_request:
     branches: [ "main" ]
     paths:
       - 'src/Feijuca.Keycloak.TokenManager/**'
+      - 'tests/**'
 
 jobs:
   build:
