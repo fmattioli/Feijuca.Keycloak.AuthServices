@@ -1,4 +1,4 @@
-﻿using Feijuca.Keycloak.Services.Models;
+﻿using Feijuca.Keycloak.MultiTenancy.Services.Models;
 using Microsoft.Extensions.DependencyInjection;
 using TokenManager.Domain.Interfaces;
 using TokenManager.Infra.Data.Repositories;

@@ -6,25 +6,32 @@ var builder = WebApplication.CreateBuilder(args);
 var enviroment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
 builder.Configuration
-    .AddJsonFile("conf/appsettings.json", false, reloadOnChange: true)
-    .AddJsonFile($"conf/appsettings.{enviroment}.json", true, reloadOnChange: true)
+    .AddJsonFile("appsettings.json", false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{enviroment}.json", true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
 var applicationSettings = builder.Configuration.GetApplicationSettings(builder.Environment);
 builder.Services.AddSingleton<ISettings>(applicationSettings);
 
 builder.Services.AddControllers();
+
 builder.Services
-    .AddMongo(applicationSettings.MongoSettings)
-    .AddLog()
+    .AddApiAuthentication(applicationSettings.AuthSettings)
+    .AddLoggingDependency()
     .AddMediator()
+    .AddRepositories(applicationSettings.AuthSettings)
     .AddEndpointsApiExplorer()
-    .AddSwaggerGen();
+    .AddSwagger(applicationSettings!.AuthSettings!);
 
 var app = builder.Build();
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "TokenManager.Api");
+    c.OAuthClientId(applicationSettings!.AuthSettings!.Resource);
+    c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
+});
 
 
 app.UseHttpsRedirection();

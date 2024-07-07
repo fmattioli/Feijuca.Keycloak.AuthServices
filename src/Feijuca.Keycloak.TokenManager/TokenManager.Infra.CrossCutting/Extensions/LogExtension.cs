@@ -7,7 +7,7 @@ namespace TokenManager.Infra.CrossCutting.Extensions
 {
     public static class LogExtension
     {
-        public static IServiceCollection AddLog(this IServiceCollection services)
+        public static IServiceCollection AddLoggingDependency(this IServiceCollection services)
         {
             Log.Logger = new LoggerConfiguration()
                 .Enrich.WithExceptionDetails()

@@ -1,5 +1,5 @@
-﻿using Feijuca.Keycloak.Extensions;
-using Feijuca.Keycloak.Services.Models;
+﻿using Feijuca.Keycloak.MultiTenancy.Extensions;
+using Feijuca.Keycloak.MultiTenancy.Services.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System.IdentityModel.Tokens.Jwt;
 

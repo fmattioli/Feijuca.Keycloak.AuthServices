@@ -1,6 +1,6 @@
 ﻿namespace TokenManager.Domain.Entities
 {
-    public class GetTokenDetails
+    public class TokenCredentials
     {
         public string ServerUrl { get; set; } = null!;
         public string Grant_Type { get; set; } = null!;

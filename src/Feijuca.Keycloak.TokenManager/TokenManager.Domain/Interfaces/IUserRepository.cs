@@ -5,7 +5,8 @@ namespace TokenManager.Domain.Interfaces
 {
     public interface IUserRepository
     {
-        Task<Result<string>> GetAccessToken(GetTokenDetails getTokenDetails);
-        Task<Result> CreateUser(User user);
+        Task<Result<TokenDetails>> GetAccessTokenAsync();
+        Task<Result> CreateUserAsync(CreateUser user);
+        Task<Result<TokenDetails>> LoginAsync(LoginUser user);
     }
 }

@@ -1,14 +1,23 @@
 ﻿using Contracts.Common;
 using MediatR;
-using TokenManager.Application.Services.Responses;
+using TokenManager.Application.Services.Mappers;
+using TokenManager.Domain.Interfaces;
 
 namespace TokenManager.Application.Services.Commands.Users
 {
-    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Result<TokenResponse>>
+    public class CreateUserCommandHandler(IUserRepository userRepository) : IRequestHandler<CreateUserCommand, Result>
     {
-        public Task<Result<TokenResponse>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+        private readonly IUserRepository _userRepository = userRepository;
+
+        public async Task<Result> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var resultUserCreated = await _userRepository.CreateUserAsync(request.AddUserRequest.ToDomain());
+            if (resultUserCreated.IsSuccess)
+            {
+                return Result.Success();
+            }
+
+            return Result.Failure(resultUserCreated.Error);
         }
     }
 }

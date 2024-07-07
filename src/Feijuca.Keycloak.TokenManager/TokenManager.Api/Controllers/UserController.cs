@@ -19,14 +19,19 @@ namespace TokenManager.Api.Controllers
         /// </summary>
         /// <returns>A status code related to the operation.</returns>
         [HttpPost]
-        [Route("addUser", Name = nameof(AddUser))]
+        [Route("createUser", Name = nameof(CreateUser))]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddUser([FromBody] AddUserRequest addUserRequest, CancellationToken cancellationToken)
+        public async Task<IActionResult> CreateUser([FromBody] AddUserRequest addUserRequest, CancellationToken cancellationToken)
         {
-            var categoryId = await _mediator.Send(new CreateUserCommand(addUserRequest), cancellationToken);
-            return Created("/addCategory", categoryId);
+            var result = await _mediator.Send(new CreateUserCommand(addUserRequest), cancellationToken);
+            if (result.IsSuccess)
+            {
+                return Created();
+            }
+
+            return BadRequest(result.Error.Description);
         }
     }
 }
