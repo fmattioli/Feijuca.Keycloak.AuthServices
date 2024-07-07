@@ -41,6 +41,11 @@ namespace Feijuca.Keycloak.MultiTenancy.Services
             return _authSettings.Realms.FirstOrDefault(r => r.Name == realmName)!;
         }
 
+        public string GetServerUrl()
+        {
+            return _authSettings.AuthServerUrl!;
+        }
+
         private string GetToken()
         {
             var authorizationHeader = _httpContextAccessor.HttpContext!.Request.Headers.Authorization.FirstOrDefault();
