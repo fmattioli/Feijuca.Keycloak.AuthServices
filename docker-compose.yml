@@ -1,0 +1,15 @@
+version: "3.7"
+
+services:
+
+    token_manager_api:
+      container_name: token_manager_api
+      build:
+        context: .
+        dockerfile: Dockerfile
+      image: token_manager_api
+      environment:
+        - APP_VERSION=${APP_VERSION}
+        - ASPNETCORE_ENVIRONMENT=Docker
+      ports:
+        - "8079:8080"
