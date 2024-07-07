@@ -1,9 +1,20 @@
 ﻿namespace Feijuca.Keycloak.MultiTenancy.Services.Models
 {
-    public record AuthSettings(string? ClientId, string? Resource, string? AuthServerUrl, string? PolicyName, IEnumerable<string>? Roles, IEnumerable<string>? Scopes)
+    public class AuthSettings
     {
+        public string? ClientId { get; set; }
+        public string? Resource { get; set; }
+        public string? AuthServerUrl { get; set; }
+        public string? PolicyName { get; set; }
+        public IEnumerable<string> Roles { get; set; } = [];
+        public IEnumerable<string> Scopes { get; set; } = [];
         public IEnumerable<Realm> Realms { get; set; } = [];
     }
 
-    public record Realm(string? Name, string? Audience, string? Issuer);
+    public class Realm
+    {
+        public string? Name { get; set; }
+        public string? Audience { get; set; }
+        public string? Issuer { get; set; }
+    }
 }
