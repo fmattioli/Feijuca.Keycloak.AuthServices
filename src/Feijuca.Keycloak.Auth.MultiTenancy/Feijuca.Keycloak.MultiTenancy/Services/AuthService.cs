@@ -31,6 +31,11 @@ namespace Feijuca.Keycloak.MultiTenancy.Services
             return _authSettings.ClientId!;
         }
 
+        public string GetClientSecret()
+        {
+            return _authSettings.ClientSecret!;
+        }
+
         public Realm GetRealm(string realmName)
         {
             return _authSettings.Realms.FirstOrDefault(r => r.Name == realmName)!;

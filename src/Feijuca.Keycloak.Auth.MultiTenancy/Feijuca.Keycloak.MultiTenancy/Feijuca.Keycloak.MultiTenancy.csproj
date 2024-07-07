@@ -14,6 +14,7 @@
     <PackageTags>keycloak</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Version>1.2.0</Version>
+    <Authors>Felipe Mattioli</Authors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
