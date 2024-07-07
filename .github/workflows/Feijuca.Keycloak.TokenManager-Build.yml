@@ -149,16 +149,3 @@ jobs:
             docker push "fmattioli/feijuca-tokenmanager-api:$VERSION"
             docker tag "fmattioli/feijuca-tokenmanager-api:$VERSION" "fmattioli/feijuca-tokenmanager-api:latest"
             docker push "fmattioli/feijuca-tokenmanager-api:latest"
-  Deploy:
-    needs: [bump, publish-docker-image]
-    name: Start deploy on Render
-    runs-on: ubuntu-latest
-    env:
-      IMAGE_URL: 'docker.io/fmattioli/feijuca-tokenmanager-api:latest'
-      VERSION_UPDATE_TYPE: ${{ needs.bump.outputs.version_update_type }}
-    steps:
-      - name: Deploy hostinger        
-        if: github.ref == 'refs/heads/main' && env.VERSION_UPDATE_TYPE == 'MINOR' || env.VERSION_UPDATE_TYPE == 'REVISION'
-        run: |
-          echo $VERSION_UPDATE_TYPE
-          curl "${{ secrets.API_URL_HOSTINGER }}"
