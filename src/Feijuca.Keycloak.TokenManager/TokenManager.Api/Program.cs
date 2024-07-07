@@ -16,6 +16,7 @@ builder.Configuration
     .AddEnvironmentVariables();
 
 var applicationSettings = builder.Configuration.GetApplicationSettings(builder.Environment);
+Console.WriteLine(applicationSettings);
 
 builder.Services.AddSingleton<ISettings>(applicationSettings);
 

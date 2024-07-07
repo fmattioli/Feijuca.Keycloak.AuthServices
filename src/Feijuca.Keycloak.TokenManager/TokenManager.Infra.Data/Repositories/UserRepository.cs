@@ -7,18 +7,19 @@ using System.Text;
 using TokenManager.Domain.Entities;
 using TokenManager.Domain.Errors;
 using TokenManager.Domain.Interfaces;
+using TokenManager.Infra.Data.Models;
 
 namespace TokenManager.Infra.Data.Repositories
 {
-    public class UserRepository(IHttpClientFactory httpClientFactory, IAuthService authService) : IUserRepository
+    public class UserRepository(IHttpClientFactory httpClientFactory, IAuthService authService, TokenCredentials tokenCredentials) : IUserRepository
     {
         private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
         private readonly IAuthService _authService = authService;
-        private readonly TokenCredentials tokenCredentials = new()
+        private readonly TokenCredentials _tokenCredentials = tokenCredentials;
+        private static readonly JsonSerializerSettings Settings = new()
         {
-            Grant_Type = "client_credentials",                  //TODO: Create environmnet variable
-            Client_Secret = "qSGxtu0CFOmZ6Yzr5ntPK2iXppmKeerS", //TODO: Create environmnet variable
-            Client_Id = "smartconsig-api"                       //TODO: Create environmnet variable
+            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore
         };
 
         public async Task<Result> CreateUserAsync(string tenant, User user)
@@ -37,13 +38,7 @@ namespace TokenManager.Infra.Data.Repositories
                     .AppendPathSegment(tenant)
                     .AppendPathSegment("users");
 
-                var settings = new JsonSerializerSettings
-                {
-                    ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                    NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore
-                };
-
-                var json = JsonConvert.SerializeObject(user, settings);
+                var json = JsonConvert.SerializeObject(user, Settings);
                 StringContent httpContent = new(json, Encoding.UTF8, "application/json");
                 var response = await client.PostAsync(url, httpContent);
 
@@ -63,11 +58,12 @@ namespace TokenManager.Infra.Data.Repositories
         public async Task<Result<TokenDetails>> GetAccessTokenAsync(string tenant)
         {
             var client = _httpClientFactory.CreateClient("KeycloakClient");
+
             var requestData = new FormUrlEncodedContent(
             [
-                new KeyValuePair<string, string>("grant_type", tokenCredentials.Grant_Type),
-                new KeyValuePair<string, string>("client_id", tokenCredentials.Client_Id),
-                new KeyValuePair<string, string>("client_secret", tokenCredentials.Client_Secret),
+                new KeyValuePair<string, string>("grant_type", "client_credentials"),
+                new KeyValuePair<string, string>("client_id", _tokenCredentials.Client_Id),
+                new KeyValuePair<string, string>("client_secret", _tokenCredentials.Client_Secret),
             ]);
 
             var url = client.BaseAddress
@@ -97,8 +93,8 @@ namespace TokenManager.Infra.Data.Repositories
             var requestData = new FormUrlEncodedContent(
             [
                 new KeyValuePair<string, string>("grant_type", "password"),
-                new KeyValuePair<string, string>("client_id", tokenCredentials.Client_Id),
-                new KeyValuePair<string, string>("client_secret", tokenCredentials.Client_Secret),
+                new KeyValuePair<string, string>("client_id", _tokenCredentials.Client_Id),
+                new KeyValuePair<string, string>("client_secret", _tokenCredentials.Client_Secret),
                 new KeyValuePair<string, string>("username", user.Username!),
                 new KeyValuePair<string, string>("password", user.Password!),
                 new KeyValuePair<string, string>("scope", "tokenmanager-write tokenmanager-read"),

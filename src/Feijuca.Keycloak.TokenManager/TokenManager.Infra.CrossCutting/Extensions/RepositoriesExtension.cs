@@ -1,6 +1,11 @@
-﻿using Feijuca.Keycloak.MultiTenancy.Services.Models;
+﻿using Feijuca.Keycloak.MultiTenancy.Services;
+using Feijuca.Keycloak.MultiTenancy.Services.Models;
 using Microsoft.Extensions.DependencyInjection;
+
+using System;
+
 using TokenManager.Domain.Interfaces;
+using TokenManager.Infra.Data.Models;
 using TokenManager.Infra.Data.Repositories;
 
 namespace TokenManager.Infra.CrossCutting.Extensions
@@ -13,9 +18,20 @@ namespace TokenManager.Infra.CrossCutting.Extensions
             {
                 client.BaseAddress = new Uri(authSettings.AuthServerUrl!);
             });
-            
 
             services.AddScoped<IUserRepository, UserRepository>();
+
+            var serviceProvider = services.BuildServiceProvider();
+            var authService = serviceProvider.GetRequiredService<IAuthService>();
+
+            var tokenCredentials = new TokenCredentials()
+            {
+                Client_Secret = authService.GetClientSecret(),
+                Client_Id = authService.GetClientId(),
+                ServerUrl = authService.GetServerUrl()
+            };
+
+            services.AddSingleton(tokenCredentials);
             return services;
         }
     }
