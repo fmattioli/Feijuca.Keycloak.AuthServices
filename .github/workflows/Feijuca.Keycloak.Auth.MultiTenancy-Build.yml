@@ -3,8 +3,12 @@ name: build_and_run_tests
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'src/Feijuca.Keycloak.MultiTenancyAuthServices/**'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'src/Feijuca.Keycloak.MultiTenancyAuthServices/**'
 
 env:
   VERSION_UPDATE_TYPE: "value"
