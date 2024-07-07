@@ -103,14 +103,14 @@ jobs:
 
   publish-nuGet-package:
     runs-on: ubuntu-latest
-    needs: [bump]
     env:
       VERSION: ${{ needs.bump.outputs.version }}
       VERSION_UPDATE_TYPE: ${{ needs.bump.outputs.version_update_type }}
-    if: github.ref == 'refs/heads/main' && env.VERSION_UPDATE_TYPE == 'MINOR' || env.VERSION_UPDATE_TYPE == 'REVISION'
+    needs: [bump]        
     name: Update NuGet package
     steps:
       - name: Checkout repository
+        if: github.ref == 'refs/heads/main' && env.VERSION_UPDATE_TYPE == 'MINOR' || env.VERSION_UPDATE_TYPE == 'REVISION'
         uses: actions/checkout@v4
       - name: Setup .NET Core @ Latest
         uses: actions/setup-dotnet@v4
@@ -118,7 +118,6 @@ jobs:
           dotnet-version: 8.0.x
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 
       - name: Restore dependencies
         run: dotnet restore src/Feijuca.Keycloak.Auth.MultiTenancy/Feijuca.Keycloak.MultiTenancy/Feijuca.Keycloak.MultiTenancy.csproj
