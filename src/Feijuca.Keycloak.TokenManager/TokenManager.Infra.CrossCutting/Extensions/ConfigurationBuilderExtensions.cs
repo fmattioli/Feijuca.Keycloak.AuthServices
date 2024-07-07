@@ -25,6 +25,7 @@ namespace TokenManager.Infra.CrossCutting.Extensions
 
                 settings.AuthSettings.AuthServerUrl = GetEnvironmentVariableFromRender("AuthServerUrl");
                 settings.AuthSettings.ClientId = GetEnvironmentVariableFromRender("ClientId");
+                settings.AuthSettings.ClientSecret = GetEnvironmentVariableFromRender("ClientSecret");
                 settings.AuthSettings.Resource = GetEnvironmentVariableFromRender("Resource");
             }
             return settings!;

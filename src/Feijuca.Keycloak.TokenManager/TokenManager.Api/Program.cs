@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using TokenManager.Infra.CrossCutting.Config;
 using TokenManager.Infra.CrossCutting.Extensions;
 using TokenManager.Infra.CrossCutting.Handlers;
@@ -16,7 +17,7 @@ builder.Configuration
     .AddEnvironmentVariables();
 
 var applicationSettings = builder.Configuration.GetApplicationSettings(builder.Environment);
-Console.WriteLine(applicationSettings);
+Console.WriteLine(JsonConvert.SerializeObject(applicationSettings));
 
 builder.Services.AddSingleton<ISettings>(applicationSettings);
 
