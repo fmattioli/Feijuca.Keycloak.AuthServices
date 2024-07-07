@@ -131,6 +131,7 @@ namespace Feijuca.Keycloak.MultiTenancy.Extensions
                 );
 
             services.AddSingleton<JwtSecurityTokenHandler>()
+                    .AddSingleton(authSettings)
                     .AddScoped<IAuthService, AuthService>();
 
             return services;

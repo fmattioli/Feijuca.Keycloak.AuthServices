@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Http;
-
+﻿using Feijuca.Keycloak.MultiTenancy.Services.Models;
+using Microsoft.AspNetCore.Http;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace Feijuca.Keycloak.MultiTenancy.Services
 {
-    public class AuthService(IHttpContextAccessor httpContextAccessor, JwtSecurityTokenHandler jwtSecurityTokenHandler) : IAuthService
+    public class AuthService(IHttpContextAccessor httpContextAccessor, JwtSecurityTokenHandler jwtSecurityTokenHandler, AuthSettings authSettings) : IAuthService
     {
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly JwtSecurityTokenHandler _tokenHandler = jwtSecurityTokenHandler;
+        private readonly AuthSettings _authSettings = authSettings;
 
         public string GetTenantFromToken()
         {
@@ -23,6 +24,16 @@ namespace Feijuca.Keycloak.MultiTenancy.Services
             var tokenInfos = _tokenHandler.ReadJwtToken(jwtToken);
             var userClaim = tokenInfos.Claims.FirstOrDefault(c => c.Type == "sub")?.Value!;
             return Guid.Parse(userClaim);
+        }
+
+        public string GetClientId()
+        {
+            return _authSettings.ClientId!;
+        }
+
+        public Realm GetRealm(string realmName)
+        {
+            return _authSettings.Realms.FirstOrDefault(r => r.Name == realmName)!;
         }
 
         private string GetToken()
