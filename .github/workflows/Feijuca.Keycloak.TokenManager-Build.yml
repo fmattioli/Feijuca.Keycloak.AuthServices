@@ -3,8 +3,12 @@ name: .NET
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'Feijuca.Keycloak.TokenManager/**'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'Feijuca.Keycloak.TokenManager/**'
 
 jobs:
   build:
