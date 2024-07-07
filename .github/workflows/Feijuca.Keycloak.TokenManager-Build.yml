@@ -4,11 +4,11 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - 'Feijuca.Keycloak.TokenManager/**'
+      - 'src/Feijuca.Keycloak.TokenManager/**'
   pull_request:
     branches: [ "main" ]
     paths:
-      - 'Feijuca.Keycloak.TokenManager/**'
+      - 'src/Feijuca.Keycloak.TokenManager/**'
 
 jobs:
   build:
