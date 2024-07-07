@@ -1,0 +1,160 @@
+name: .NET
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build applicaton
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore dependencies
+        run: dotnet restore src/Feijuca.Keycloak.TokenManager/TokenManager.Api/TokenManager.Api.csproj
+      - name: Build project
+        run: dotnet build --no-restore --configuration Release src/Feijuca.Keycloak.TokenManager/TokenManager.Api/TokenManager.Api.csproj
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    name: Run unit tests
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore dependencies and run unit tests
+        run: |
+          dotnet restore tests/TokenManager.UnitTests/TokenManager.UnitTests.csproj
+          dotnet build --no-restore --configuration Release tests/TokenManager.UnitTests/TokenManager.UnitTests.csproj
+          dotnet test --verbosity normal tests/TokenManager.UnitTests/TokenManager.UnitTests.csproj
+  bump:
+    name: Update project version
+    runs-on: ubuntu-latest
+    needs: [build,unit-tests]
+    outputs:
+      version: ${{ steps.set-version.outputs.VERSION }}
+      version_update_type: ${{ steps.determine_update_type.outputs.VERSION_UPDATE_TYPE }} 
+      
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Determinar Tipo de Mudança
+        id: determine_update_type
+        run: |
+          LAST_COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+          if echo "$LAST_COMMIT_MESSAGE" | grep -qiE "feat"; then
+            echo "VERSION_UPDATE_TYPE=MINOR" >> $GITHUB_OUTPUT
+            echo "VERSION_UPDATE_TYPE=MINOR" >> $GITHUB_ENV
+          fi
+          if echo "$LAST_COMMIT_MESSAGE" | grep -qiE "fix"; then
+            echo "VERSION_UPDATE_TYPE=REVISION" >> $GITHUB_OUTPUT
+            echo "VERSION_UPDATE_TYPE=REVISION" >> $GITHUB_ENV
+          fi
+          if echo "$LAST_COMMIT_MESSAGE" | grep -qiE "chore"; then
+            echo "VERSION_UPDATE_TYPE=REVISION" >> $GITHUB_OUTPUT
+            echo "VERSION_UPDATE_TYPE=REVISION" >> $GITHUB_ENV
+          fi
+
+      - name: Print Update type
+        run: |
+          echo "Tipo de Mudança: ${{ steps.determine_update_type.outputs.VERSION_UPDATE_TYPE }}"
+
+      - name: Bump build version - Minor
+        if: env.VERSION_UPDATE_TYPE == 'MINOR'
+        id: bump-minor
+        uses: vers-one/dotnet-project-version-updater@v1.5
+        with:
+          file: src/Feijuca.Keycloak.TokenManager/TokenManager.Api/TokenManager.Api.csproj
+          version: "*.^.0"
+
+      - name: Bump build version - Revision
+        if: env.VERSION_UPDATE_TYPE == 'REVISION'
+        id: bump-revision
+        uses: vers-one/dotnet-project-version-updater@v1.5
+        with:
+          file: src/Feijuca.Keycloak.TokenManager/TokenManager.Api/TokenManager.Api.csproj
+          version: "*.*.^"
+          
+      - name: Commit and push changes - MINOR
+        if: env.VERSION_UPDATE_TYPE == 'MINOR'
+        run: |
+          git config user.name "Build - Incrementing version | Github action"
+          git config user.email "deploy@spendmanagement.com"
+          git add .
+          git commit -m "CI: Updating application version ${{ steps.bump-minor.outputs.newVersion }}"
+          git push
+
+      - name: Commit and push changes - Revision
+        if: env.VERSION_UPDATE_TYPE == 'REVISION'
+        run: |
+          git config user.name "Build - Incrementing version | Github action"
+          git config user.email "deploy@spendmanagement.com"
+          git add .
+          git commit -m "CI: Updating application version ${{ steps.bump-revision.outputs.newVersion }}"
+          git push
+
+      - name: Set version - Revision
+        id: set-version
+        if: env.VERSION_UPDATE_TYPE == 'MINOR' || env.VERSION_UPDATE_TYPE == 'REVISION'
+        run: |
+          if [[ ${{ steps.determine_update_type.outputs.VERSION_UPDATE_TYPE }} == 'REVISION' ]]; then
+            echo "VERSION=${{ steps.bump-revision.outputs.newVersion }}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=${{ steps.bump-minor.outputs.newVersion }}" >> $GITHUB_OUTPUT
+          fi
+         
+  publish-docker-image:
+    name: Publish new docker image
+    needs: [bump]
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.bump.outputs.version }}
+      VERSION_UPDATE_TYPE: ${{ needs.bump.outputs.version_update_type }}
+    steps:      
+      - name: Print version + type
+        if: env.VERSION_UPDATE_TYPE == 'MINOR' || env.VERSION_UPDATE_TYPE == 'REVISION'
+        run: |                    
+          echo "The csproj version is $VERSION-$VERSION_UPDATE_TYPE"
+
+      - name: Checkout repository
+        if: env.VERSION_UPDATE_TYPE == 'MINOR' || env.VERSION_UPDATE_TYPE == 'REVISION'
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        if: env.VERSION_UPDATE_TYPE == 'MINOR' || env.VERSION_UPDATE_TYPE == 'REVISION'
+        run: docker build -t "fmattioli/feijuca-tokenmanager-api:$VERSION" .
+  
+      - name: Login to Docker Hub
+        if: env.VERSION_UPDATE_TYPE == 'MINOR' || env.VERSION_UPDATE_TYPE == 'REVISION'
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+  
+      - name: Push Docker image to Docker Hub
+        id: publish-image
+        if: env.VERSION_UPDATE_TYPE == 'MINOR' || env.VERSION_UPDATE_TYPE == 'REVISION'
+        run: |
+            docker push "fmattioli/feijuca-tokenmanager-api:$VERSION"
+            docker tag "fmattioli/feijuca-tokenmanager-api:$VERSION" "fmattioli/feijuca-tokenmanager-api:latest"
+            docker push "fmattioli/feijuca-tokenmanager-api:latest"
+  Deploy:
+    needs: [bump, publish-docker-image]
+    name: Start deploy on Render
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_URL: 'docker.io/fmattioli/feijuca-tokenmanager-api:latest'
+      VERSION_UPDATE_TYPE: ${{ needs.bump.outputs.version_update_type }}
+    steps:
+      - name: Deploy hostinger        
+        if: github.ref == 'refs/heads/main' && env.VERSION_UPDATE_TYPE == 'MINOR' || env.VERSION_UPDATE_TYPE == 'REVISION'
+        run: |
+          echo $VERSION_UPDATE_TYPE
+          curl "${{ secrets.API_URL_HOSTINGER }}"
