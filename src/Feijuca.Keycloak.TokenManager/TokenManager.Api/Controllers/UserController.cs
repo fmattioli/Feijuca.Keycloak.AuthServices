@@ -1,11 +1,7 @@
-﻿using Contracts.Common;
-using Contracts.Web.Attributes;
-
+﻿using Contracts.Web.Attributes;
 using MediatR;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 using TokenManager.Application.Services.Commands.Users;
 using TokenManager.Application.Services.Requests.User;
 using TokenManager.Application.Services.Responses;
@@ -45,7 +41,6 @@ namespace TokenManager.Api.Controllers
             return BadRequest(response);
         }
 
-
         /// <summary>
         /// Return a valid JWT token and details about them.
         /// </summary>
@@ -60,12 +55,17 @@ namespace TokenManager.Api.Controllers
         public async Task<IActionResult> Login([FromBody] LoginUserRequest loginUserRequest, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new LoginUserCommand(loginUserRequest), cancellationToken);
+
+            var response = new ResponseResult<TokenResponse>();
             if (result.IsSuccess)
             {
+                response.Result = result.Value;
+                response.DetailMessage = "Token generated with succesfully";
                 return Created();
             }
 
-            return BadRequest(result.Error.Description);
+            response.DetailMessage = result.Error.Description;
+            return BadRequest(response);
         }
     }
 }
