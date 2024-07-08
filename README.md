@@ -2,16 +2,28 @@
 
 [![MIT License][license-shield]][license-url]
 
-<!-- ABOUT THE PROJECT -->
 ## About The Project
-This project has a quickly purpose: Extend the behavior of [keycloak-authorization-services-dotnet](https://nikiforovall.github.io/keycloak-authorization-services-dotnet/) but adding a multi-tenancy support.
-Maybe you are asking yourself, what is feijuca? Well... Feijuca is a nickname for a famous Brazilian dish called [Feijoada](https://theculturetrip.com/south-america/brazil/articles/a-brief-introduction-to-feijoada-brazils-national-dish). I wanted to use a name representing my country on this project and Feijuca was chosen.
+This repository aims to provide a configuration option for .NET projects that are using or planning to use Keycloak for authentication and JWT token generation.
+The project consists of two distinct parts. The first one is Feijuca.Keycloak.Auth.MultiTenancy and the second one is Feijuca.Keycloak.TokenManager.
 
+### What is **Feijuca.Keycloak.Auth.MultiTenancy**?
+a [nuGet](https://www.nuget.org/packages/Feijuca.Keycloak.MultiTenancy) package that enables the implementation of multi-tenancy concepts using Keycloak. In this context, each realm in Keycloak can represent a different tenant, allowing for unique configurations for each one. This ensures that each tenant within your application can have its own settings within Keycloak.
+As a result, it is possible to create usage models where certain tenants have access to specific modules while others do not, all within the same instance of Keycloak.
+With this nuGet you can also:
+Obtaining a tenant from a token.
+Extracting an ID from a token.
+Getting the URL where Keycloak is running.
+If you wanna get another properties about a tenant, just open a PR and we can discuss it :)
+Simplification of managing actions in Keycloak:
 
-## Motivation
-Keycloak may not be the best solution to work with multi-tenancy authentication, but we have the possibility of achieving this using the multi-realm context, basically we can have multi-realms within a keycloak instance and you can treat each realm as a tenant within your application.
-Therefore, this project aims to provide a model where this objective can be achieved. :smile:
-
+### What is **Feijuca.Keycloak.TokenManager**?
+Managing certain actions in Keycloak can be complicated. For instance, creating a user involves several steps: obtaining a token, creating the user, and setting a password.
+With Feijuca.Keycloak.TokenManager, you can create a user in a single request since all necessary actions are already integrated into the project.
+This project also provides additional endpoints, such as:
+- Resetting a user's password via email.
+- Email confirmation.
+- Checking a user's status to determine if they are valid (email confirmed).
+- You can also define endpoints according to your needs. If you find them useful for a broader audience, feel free to open a PR in this repository.
 
 ### Built With
 <img src="https://img.shields.io/badge/dotnet8-blue" />
