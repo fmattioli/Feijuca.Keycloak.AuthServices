@@ -8,22 +8,25 @@
 ### Prerequisites
 This project was made with the purpose to attend only applications that follows the current [.Net Supported versions.](https://dotnet.microsoft.com/en-us/download/dotnet) 
 
-## Why feijuca?
+## Why Feijuca?
 Feijuca is a nickname for a famous Brazilian dish called [Feijoada](https://theculturetrip.com/south-america/brazil/articles/a-brief-introduction-to-feijoada-brazils-national-dish). I wanted to use a name representing my born country on this project and Feijuca was chosen.
 
-## About the Project
+## About the project
 This repository aims to provide a configuration option for .NET projects that are using or planning to use Keycloak for authentication and JWT token generation. The project consists of two distinct parts:
 1. **Feijuca.Keycloak.Auth.MultiTenancy**
 2. **Feijuca.Keycloak.TokenManager**
+
+**Attention:** 
+- The projects work in isolation way, there is no dependency between them. You do not need use one to use other, note that each project has different purpose, below you can understand better:
 
 ## Feijuca.Keycloak.Auth.MultiTenancy
 A [NuGet](https://www.nuget.org/packages/Feijuca.Keycloak.MultiTenancy) package that enables the implementation of multi-tenancy concepts using Keycloak. Each realm in Keycloak can represent a different tenant, allowing for unique configurations for each one. This ensures that each tenant within your application can have its own settings within Keycloak.
 
 ### Features
+- Enjoy all existigns keycloak features following a multi tenancy concept based on your realms
 - Obtaining a tenant from a token.
-- Extracting an ID from a token.
+- Extracting an UserId from a token.
 - Getting the URL where Keycloak is running.
-- Custom properties for tenants (open a PR to discuss additional features).
 - Simplification of managing actions in Keycloak.
 
 ## Feijuca.Keycloak.TokenManager
