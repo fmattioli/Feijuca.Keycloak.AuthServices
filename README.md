@@ -108,7 +108,7 @@ If you wish use  to accomplish the goal to use multi tenancy concept based on ea
       "ClientSecret": "your-client-secret",
       "ClientId": "your-client-id",
       "Resource": "your-client-id",
-      "AuthServerUrl": "https://url-keycloakt/realms/10000/protocol/openid-connect/token"
+      "AuthServerUrl": "https://url-keycloakt"
       }
    }
    ```
