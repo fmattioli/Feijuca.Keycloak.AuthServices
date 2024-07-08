@@ -1,8 +1,12 @@
-<a id="readme-top"></a>
-
 [![MIT License][license-shield]][license-url]
 
-## About The Project
+### Built With
+<img src="https://img.shields.io/badge/dotnet8-blue" />
+
+### Prerequisites
+This project was made with the purpose to attend only applications that follows the current [.Net Supported versions.](https://dotnet.microsoft.com/en-us/download/dotnet) 
+
+## About the Project
 This repository aims to provide a configuration option for .NET projects that are using or planning to use Keycloak for authentication and JWT token generation.
 The project consists of two distinct parts. The first one is Feijuca.Keycloak.Auth.MultiTenancy and the second one is Feijuca.Keycloak.TokenManager.
 
@@ -24,12 +28,6 @@ This project also provides additional endpoints, such as:
 - Email confirmation.
 - Checking a user's status to determine if they are valid (email confirmed).
 - You can also define endpoints according to your needs. If you find them useful for a broader audience, feel free to open a PR in this repository.
-
-### Built With
-<img src="https://img.shields.io/badge/dotnet8-blue" />
-
-### Prerequisites
-This project was made with the purpose to attend only applications that follows the current [.Net Supported versions.](https://dotnet.microsoft.com/en-us/download/dotnet) 
 
 ## Getting Started
 Well, as explained previously, this project is just a quicky extension to add multi tenancy support following everything that is done in the [keycloak-authorization-services-dotnet](https://nikiforovall.github.io/keycloak-authorization-services-dotnet/).
