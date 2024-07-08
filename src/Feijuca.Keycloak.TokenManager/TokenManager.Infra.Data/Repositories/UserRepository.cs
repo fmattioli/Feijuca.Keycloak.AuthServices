@@ -64,7 +64,7 @@ namespace TokenManager.Infra.Data.Repositories
             return Result<TokenDetails>.Failure(UserErrors.TokenGenerationError);
         }
 
-        public async Task<Result> DoNewUserCreationActions(string tenant, User user)
+        public async Task<Result> CreateNewUserActions(string tenant, User user)
         {
             var tokenBearerResult = await GetAccessTokenAsync(tenant);
             if (tokenBearerResult.IsSuccess)
@@ -75,7 +75,8 @@ namespace TokenManager.Infra.Data.Repositories
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var userName = await GetUserAsync(user.Username);
+                    var keycloakUser = await GetUserAsync(user.Username!);
+                    await ResetPasswordAsync(keycloakUser.Value.Id!, user.Password!);
                     return Result.Success();
                 }
 
@@ -113,6 +114,59 @@ namespace TokenManager.Infra.Data.Repositories
 
             var user = JsonConvert.DeserializeObject<List<User>>(keycloakUserContent)!;
             return Result<User>.Success(user[0]);
+        }
+
+        public async Task<Result> ResetPasswordAsync(string userId, string password)
+        {
+            var url = urlUserActions
+                .AppendPathSegment(userId)
+                .AppendPathSegment("reset-password");
+
+            var passwordData = new
+            {
+                type = "password",
+                temporary = false,
+                value = password
+            };
+
+            var json = JsonConvert.SerializeObject(passwordData, Settings);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PutAsync(url, httpContent);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return Result.Success();
+            }
+
+            var responseMessage = await response.Content.ReadAsStringAsync();
+            UserErrors.SetTechnicalMessage(responseMessage);
+            return Result.Failure(UserErrors.InvalidUserNameOrPasswordError);
+        }
+
+        public async Task<Result> SendEmailVerificationAsync(string userId)
+        {
+            var url = urlUserActions
+                .AppendPathSegment(userId);
+
+            var requestData = new
+            {
+                requiredActions = new string[] { "VERIFY_EMAIL" }
+            };
+
+            var json = JsonConvert.SerializeObject(requestData, Settings);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PutAsync(url, httpContent);
+
+            if (response.IsSuccessStatusCode)
+            {
+                url = url.AppendPathSegment("send-verify-email");
+                await _httpClient.PutAsync(url, default!);
+                return Result.Success();
+            }
+
+            var responseMessage = await response.Content.ReadAsStringAsync();
+            UserErrors.SetTechnicalMessage(responseMessage);
+            return Result.Failure(UserErrors.InvalidUserNameOrPasswordError);
         }
 
         public async Task<Result<TokenDetails>> LoginAsync(User user)

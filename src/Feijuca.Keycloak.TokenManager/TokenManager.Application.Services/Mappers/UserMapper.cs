@@ -9,7 +9,7 @@ namespace TokenManager.Application.Services.Mappers
         public static User ToDomain(this AddUserRequest userRequest)
         {
             var attributes = userRequest.Attributes!.ToDomain(userRequest.Tenant!);
-            return new User(userRequest.Username!, userRequest.Email!, userRequest.FirstName!, userRequest.LastName!, attributes);
+            return new User(userRequest.Username!, userRequest.Password, userRequest.Email!, userRequest.FirstName!, userRequest.LastName!, attributes);
         }
 
         public static Attributes ToDomain(this AttributesRequest attributes, string tenant)
