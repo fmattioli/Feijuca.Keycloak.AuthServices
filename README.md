@@ -36,8 +36,9 @@ Managing certain actions in Keycloak can be complicated. For instance, creating 
 - Custom endpoints (open a PR to discuss additional features).
 
 ## Getting Started - Multi tenancy configuration
-If you wish use  to accomplish the goal to use multi tenancy concept based on each realm on your keycloak instance, here is the steps to configure it:
-1. Fill out the appsettings configs related to your realms (tenants)
+To accomplish the goal to use multi tenancy concept based on each realm (Where each realm would be a different tenant), here is the steps to configure it:
+TODO: Descrever passos necessarios no keycloak para mapear o tenant para o token.
+1. Filled out appsettings file on your application, relate all of yours realms (tenants)
    ```sh
    {
       "AuthSettings": {
@@ -61,25 +62,31 @@ If you wish use  to accomplish the goal to use multi tenancy concept based on ea
       "ClientSecret": "your-client-secret",
       "ClientId": "your-client-id",
       "Resource": "your-client-id",
-      "AuthServerUrl": "https://url-keycloakt/realms/10000/protocol/openid-connect/token"
+      "AuthServerUrl": "https://url-keycloak"
       }
    }
    ```
-2. Configure dependency injection (Note that AuthSettings is a model defined on **Feijuca.Keycloak.Auth.MultiTenancy**, usually I mapped it to variable. for example:
+2. Configure dependency injection (Note that AuthSettings is a model defined on **Feijuca.Keycloak.Auth.MultiTenancy**, I recommend you use the GetSection method to map the appsettings configs to the AuthSettings model:
    ```sh
    var settings = configuration.GetSection("AuthSettings").Get<AuthSettings>();
+   ```
    
+3. Add the service to the service collection from your application, I recommend you create a new extension method as below:
+   ```sh   
    builder.Services
     .AddApiAuthentication(applicationSettings.AuthSettings!);
    
-   public static IServiceCollection AddApiAuthentication(this IServiceCollection services, AuthSettings authSettings)
-   {
-       services.AddHttpContextAccessor();
-       services.AddSingleton<JwtSecurityTokenHandler>();
-       services.AddKeyCloakAuth(authSettings!);
-   
-       return services;
-   }
+   public static class AuthExtension
+    {
+        public static IServiceCollection AddApiAuthentication(this IServiceCollection services, AuthSettings authSettings)
+        {
+            services.AddHttpContextAccessor();
+            services.AddSingleton<JwtSecurityTokenHandler>();
+            services.AddKeyCloakAuth(authSettings!);
+
+            return services;
+        }
+    }
    ```
 
 ## Getting Started - Using Token Manager Api
