@@ -39,8 +39,16 @@ With **Feijuca.Keycloak.TokenManager**, you can create a user in a single reques
 
 ## Getting Started - Multi tenancy configuration
 To accomplish the goal to use multi tenancy concept based on each realm (Where each realm would be a different tenant), here is the steps to configure it:
-TODO: Descrever passos necessarios no keycloak para mapear o tenant para o token.
-1. Filled out appsettings file on your application, relate all of yours realms (tenants)
+I assume that you already had the configurations created on your keycloak instance, as for example, a client_id created with their configurations related created.
+Starting from this point, to use **Feijuca.Keycloak.Auth.MultiTenancy** follow the steps below:
+1. The tenant that each user belongs is stored on a user attribute, the tenant value should be the name of the realm. You can create a new attribute manually or using **Feijuca.Keycloak.TokenManager** you can create a user with these  default attributes below:
+![image](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/assets/27566574/8dcf2109-2145-4e53-9487-ab8fe2582fff)
+
+2. Create a new audience related to the scopes from your client and include this audience on your client:
+This step is mandatory because on each request received the tool will validate the tokena audience following what was filled out on step 3.
+![image](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/assets/27566574/6b7b437e-fa29-4776-b29f-4dba8e6d1f21)
+
+3. Filled out appsettings file on your application, relate all of yours realms (tenants)
    ```sh
    {
       "AuthSettings": {
@@ -68,12 +76,12 @@ TODO: Descrever passos necessarios no keycloak para mapear o tenant para o token
       }
    }
    ```
-2. Configure dependency injection (Note that AuthSettings is a model defined on **Feijuca.Keycloak.Auth.MultiTenancy**, I recommend you use the GetSection method to map the appsettings configs to the AuthSettings model:
+4. Configure dependency injection (Note that AuthSettings is a model defined on **Feijuca.Keycloak.Auth.MultiTenancy**, I recommend you use the GetSection method to map the appsettings configs to the AuthSettings model:
    ```sh
    var settings = configuration.GetSection("AuthSettings").Get<AuthSettings>();
    ```
    
-3. Add the service to the service collection from your application, I recommend you create a new extension method as below:
+5. Add the service to the service collection from your application, I recommend you create a new extension method as below:
    ```sh   
    builder.Services
     .AddApiAuthentication(applicationSettings.AuthSettings!);
@@ -90,7 +98,7 @@ TODO: Descrever passos necessarios no keycloak para mapear o tenant para o token
         }
     }
    ```
-
+ 
 ## Getting Started - Using Token Manager Api
 If you wish use  to accomplish the goal to use multi tenancy concept based on each realm on your keycloak instance, here is the steps to configure it:
 1. Fill out the appsettings configs related to your realms (tenants)
