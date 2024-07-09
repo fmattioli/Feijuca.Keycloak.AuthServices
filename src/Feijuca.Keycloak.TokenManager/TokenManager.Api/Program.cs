@@ -35,14 +35,15 @@ builder.Services
 
 var app = builder.Build();
 
-app.UseExceptionHandler()
-    .UseSwagger()
-    .UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "TokenManager.Api");
-        c.OAuthClientId(applicationSettings!.AuthSettings!.Resource);
-        c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
-    });
+app.UseCors("AllowAllOrigins")
+   .UseExceptionHandler()
+   .UseSwagger()
+   .UseSwaggerUI(c =>
+   {
+       c.SwaggerEndpoint("/swagger/v1/swagger.json", "TokenManager.Api");
+       c.OAuthClientId(applicationSettings!.AuthSettings!.Resource);
+       c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
+   });
 
 app.UseHttpsRedirection()
    .UseAuthorization();

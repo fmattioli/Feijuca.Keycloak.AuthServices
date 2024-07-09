@@ -6,9 +6,9 @@ namespace TokenManager.Application.Services.Mappers
 {
     public static class UserMapper
     {
-        public static User ToDomain(this AddUserRequest userRequest)
+        public static User ToDomain(this AddUserRequest userRequest, string tenant)
         {
-            var attributes = userRequest.Attributes!.ToDomain(userRequest.Tenant!);
+            var attributes = userRequest.Attributes!.ToDomain(tenant);
             return new User(userRequest.Username!, userRequest.Password, userRequest.Email!, userRequest.FirstName!, userRequest.LastName!, attributes);
         }
 
@@ -17,7 +17,7 @@ namespace TokenManager.Application.Services.Mappers
             return new Attributes(attributes.ZoneInfo, attributes.Birthdate, attributes.PhoneNumber, attributes.Gender, attributes.Fullname, tenant, attributes.Picture);
         }
 
-        public static User ToDomain(this LoginUserRequest loginUserRequest)
+        public static User ToDomain(this LoginUserRequest loginUserRequest, string tenant)
         {
             return new User(loginUserRequest.Username, loginUserRequest.Password);
         }

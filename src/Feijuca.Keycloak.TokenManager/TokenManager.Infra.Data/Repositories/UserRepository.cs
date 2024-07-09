@@ -17,8 +17,12 @@ namespace TokenManager.Infra.Data.Repositories
         private readonly IAuthService _authService;
         private readonly TokenCredentials _tokenCredentials;
         private readonly HttpClient _httpClient;
-
-        private string urlUserActions = "";
+        private string _urlUserActions = "";
+        private static readonly JsonSerializerSettings Settings = new()
+        {
+            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore
+        };
 
         public UserRepository(IHttpClientFactory httpClientFactory, IAuthService authService, TokenCredentials tokenCredentials)
         {
@@ -26,13 +30,7 @@ namespace TokenManager.Infra.Data.Repositories
             _authService = authService;
             _tokenCredentials = tokenCredentials;
             _httpClient = _httpClientFactory.CreateClient("KeycloakClient");
-        }
-
-        private static readonly JsonSerializerSettings Settings = new()
-        {
-            ContractResolver = new CamelCasePropertyNamesContractResolver(),
-            NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore
-        };
+        }        
 
         public async Task<Result<TokenDetails>> GetAccessTokenAsync(string tenant)
         {
@@ -86,29 +84,19 @@ namespace TokenManager.Infra.Data.Repositories
             }
 
             return Result.Failure(UserErrors.InvalidUserNameOrPasswordError);
-        }
-
-        private void ConfigureHttpClient(string tenant, string accessToken)
-        {
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
-            urlUserActions = _httpClient.BaseAddress
-                    .AppendPathSegment("admin")
-                    .AppendPathSegment("realms")
-                    .AppendPathSegment(tenant)
-                    .AppendPathSegment("users");
-        }
+        }        
 
         public async Task<HttpResponseMessage> CreateNewUserAsync(User user)
         {
             var json = JsonConvert.SerializeObject(user, Settings);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync(urlUserActions, httpContent);
+            var response = await _httpClient.PostAsync(_urlUserActions, httpContent);
             return response;
         }
 
         public async Task<Result<User>> GetUserAsync(string userName)
         {
-            var url = urlUserActions.SetQueryParam("username", userName);
+            var url = _urlUserActions.SetQueryParam("username", userName);
             var response = await _httpClient.GetAsync(url);
             var keycloakUserContent = await response.Content.ReadAsStringAsync();
 
@@ -118,7 +106,7 @@ namespace TokenManager.Infra.Data.Repositories
 
         public async Task<Result> ResetPasswordAsync(string userId, string password)
         {
-            var url = urlUserActions
+            var url = _urlUserActions
                 .AppendPathSegment(userId)
                 .AppendPathSegment("reset-password");
 
@@ -145,7 +133,7 @@ namespace TokenManager.Infra.Data.Repositories
 
         public async Task<Result> SendEmailVerificationAsync(string userId)
         {
-            var url = urlUserActions
+            var url = _urlUserActions
                 .AppendPathSegment(userId);
 
             var requestData = new
@@ -169,8 +157,14 @@ namespace TokenManager.Infra.Data.Repositories
             return Result.Failure(UserErrors.InvalidUserNameOrPasswordError);
         }
 
-        public async Task<Result<TokenDetails>> LoginAsync(User user)
+        public async Task<Result<TokenDetails>> LoginAsync(string tenant, User user)
         {
+            var urlGetToken = _httpClient.BaseAddress.AppendPathSegment("realms")
+                .AppendPathSegment(tenant)
+                .AppendPathSegment("protocol")
+                .AppendPathSegment("openid-connect")
+                .AppendPathSegment("token");
+
             var requestData = new FormUrlEncodedContent(
             [
                 new KeyValuePair<string, string>("grant_type", "password"),
@@ -181,16 +175,7 @@ namespace TokenManager.Infra.Data.Repositories
                 new KeyValuePair<string, string>("scope", "tokenmanager-write tokenmanager-read"),
             ]);
 
-            var tenant = _authService.GetTenantFromToken();
-
-            var url = _httpClient.BaseAddress
-                .AppendPathSegment("realms")
-                .AppendPathSegment(tenant)
-                .AppendPathSegment("protocol")
-                .AppendPathSegment("openid-connect")
-                .AppendPathSegment("token");
-
-            var response = await _httpClient.PostAsync(url, requestData);
+            var response = await _httpClient.PostAsync(urlGetToken, requestData);
 
             if (response.IsSuccessStatusCode)
             {
@@ -202,6 +187,17 @@ namespace TokenManager.Infra.Data.Repositories
             var responseMessage = await response.Content.ReadAsStringAsync();
             UserErrors.SetTechnicalMessage(responseMessage);
             return Result<TokenDetails>.Failure(UserErrors.InvalidUserNameOrPasswordError);
+        }
+
+        private void ConfigureHttpClient(string tenant, string accessToken)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+
+            _urlUserActions = _httpClient.BaseAddress
+                    .AppendPathSegment("admin")
+                    .AppendPathSegment("realms")
+                    .AppendPathSegment(tenant)
+                    .AppendPathSegment("users");            
         }
     }
 }
