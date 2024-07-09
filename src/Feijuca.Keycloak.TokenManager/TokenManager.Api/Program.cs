@@ -17,12 +17,12 @@ builder.Configuration
     .AddEnvironmentVariables();
 
 var applicationSettings = builder.Configuration.GetApplicationSettings(builder.Environment);
-Console.WriteLine(JsonConvert.SerializeObject(applicationSettings));
 
-builder.Services.AddSingleton<ISettings>(applicationSettings);
+builder.Services
+    .AddSingleton<ISettings>(applicationSettings)
+    .AddControllers();
 
-builder.Services.AddControllers();
-
+builder.Services.AddSwagger(applicationSettings!.AuthSettings!);
 builder.Services
     .AddExceptionHandler<GlobalExceptionHandler>()
     .AddProblemDetails()
@@ -30,8 +30,17 @@ builder.Services
     .AddLoggingDependency()
     .AddMediator()
     .AddRepositories(applicationSettings.AuthSettings)
-    .AddEndpointsApiExplorer()
-    .AddSwagger(applicationSettings!.AuthSettings!);
+    .AddEndpointsApiExplorer()    
+    .AddCors(options =>
+    {
+        options.AddPolicy("AllowAllOrigins", policy =>
+        {
+            policy
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+    });
 
 var app = builder.Build();
 

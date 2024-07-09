@@ -6,15 +6,15 @@ namespace TokenManager.Application.Services.Mappers
 {
     public static class UserMapper
     {
-        public static User ToDomain(this AddUserRequest userRequest, string tenant)
+        public static User ToDomain(this AddUserRequest userRequest)
         {
-            var attributes = userRequest.Attributes!.ToDomain(tenant);
+            var attributes = userRequest.Attributes!.ToDomain();
             return new User(userRequest.Username!, userRequest.Password, userRequest.Email!, userRequest.FirstName!, userRequest.LastName!, attributes);
         }
 
-        public static Attributes ToDomain(this AttributesRequest attributes, string tenant)
+        public static Attributes ToDomain(this AttributesRequest attributes)
         {
-            return new Attributes(attributes.ZoneInfo, attributes.Birthdate, attributes.PhoneNumber, attributes.Gender, attributes.Fullname, tenant, attributes.Picture);
+            return new Attributes(attributes.ZoneInfo, attributes.Birthdate, attributes.PhoneNumber, attributes.Gender, attributes.Fullname, attributes.Tenant, attributes.Picture);
         }
 
         public static User ToDomain(this LoginUserRequest loginUserRequest, string tenant)

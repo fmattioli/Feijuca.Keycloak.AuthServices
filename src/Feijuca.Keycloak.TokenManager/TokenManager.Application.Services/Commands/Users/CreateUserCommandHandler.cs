@@ -11,7 +11,7 @@ namespace TokenManager.Application.Services.Commands.Users
 
         public async Task<Result> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
-            var resultUserCreated = await _userRepository.CreateNewUserActions(request.Tenant, request.AddUserRequest.ToDomain(request.Tenant));
+            var resultUserCreated = await _userRepository.CreateNewUserActions(request.Tenant, request.AddUserRequest.ToDomain());
             if (resultUserCreated.IsSuccess)
             {
                 return Result.Success();
