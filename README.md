@@ -5,37 +5,35 @@
 ### Built With
 <img src="https://img.shields.io/badge/dotnet8-blue" />
 
-### Prerequisites
+### Prerequisites 📋
 This project was made with the purpose to attend only applications that follows the current [.Net Supported versions.](https://dotnet.microsoft.com/en-us/download/dotnet) 
 
-## Why Feijuca?
-Feijuca is a nickname for a famous Brazilian dish called [Feijoada](https://theculturetrip.com/south-america/brazil/articles/a-brief-introduction-to-feijoada-brazils-national-dish). I wanted to use a name representing my born country on this project and Feijuca was chosen.
+## Why Feijuca 🫘?
+Feijuca is a nickname for a famous Brazilian dish called [Feijoada](https://theculturetrip.com/south-america/brazil/articles/a-brief-introduction-to-feijoada-brazils-national-dish). I wanted to use a name representing my country on this project and Feijuca was chosen.
 
-## About the project
+## **About the project🧾**
 This repository aims to provide a configuration option for .NET projects that are using or planning to use Keycloak for authentication and JWT token generation. The project consists of two distinct parts:
 1. **Feijuca.Keycloak.Auth.MultiTenancy**
 2. **Feijuca.Keycloak.TokenManager**
 
-**Attention:** 
+**Attention: 🫵** 
 - The projects work in isolation way, there is no dependency between them. You do not need use one to use other, note that each project has different purpose, below you can understand better:
 
-## Feijuca.Keycloak.Auth.MultiTenancy
+## Feijuca.Keycloak.Auth.MultiTenancy 👨🏽‍💻
 A [NuGet](https://www.nuget.org/packages/Feijuca.Keycloak.MultiTenancy) package that enables the implementation of multi-tenancy concepts using Keycloak. Each realm in Keycloak can represent a different tenant, allowing for unique configurations for each one. This ensures that each tenant within your application can have its own settings within Keycloak.
 
-### Features
+### Features ⛲
 - You can use all existings keycloak features following a multi tenancy concept based on your realms, so you can handle different configurations based on each tenant (realm).
 - With just one instance from your application you can handle different tenants using the same JWT token generation config
 - Obtaining information such as a tenant, user id, url and so on from a token. (If you wanna implement a method do retrieve another thing related to the token, open a PR)
 
-## Feijuca.Keycloak.TokenManager
+## Feijuca.Keycloak.TokenManager 👨🏽‍💻
 Managing certain actions in Keycloak can be complicated. For instance, creating a new user using the keycloak api involves several steps: obtaining a token, creating the user, setting a password...
 With **Feijuca.Keycloak.TokenManager**, you can create a user in a single request since all necessary actions are already integrated into the project.
 
-### Features
-- Resetting a user's password via email.
-- Email confirmation.
-- Checking a user's status to determine if they are valid (email confirmed).
-- Custom endpoints (open a PR to discuss additional features).
+### Features ⛲
+- Every action in one place. Forget about call multiples endpoints to do actions about users on keycloak. Do actions related to the user (Creation, remotion, e-mail confirming, password redefinition, and so on) based on predefined endpoints.
+- Custom endpoints based on your necessities (If you think it could be helpful to the project, open a PR to discuss additional features).
 
 ## Getting Started - Multi tenancy configuration
 To accomplish the goal to use multi tenancy concept based on each realm (Where each realm would be a different tenant), here is the steps to configure it: I assume that you already had the configurations on your keycloak instance, as for example, a client created with their configurations related (scopes and etc.)
