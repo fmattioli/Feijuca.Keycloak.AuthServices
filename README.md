@@ -38,15 +38,18 @@ With **Feijuca.Keycloak.TokenManager**, you can create a user in a single reques
 - Custom endpoints (open a PR to discuss additional features).
 
 ## Getting Started - Multi tenancy configuration
-To accomplish the goal to use multi tenancy concept based on each realm (Where each realm would be a different tenant), here is the steps to configure it:
-I assume that you already had the configurations created on your keycloak instance, as for example, a client_id created with their configurations related created.
+To accomplish the goal to use multi tenancy concept based on each realm (Where each realm would be a different tenant), here is the steps to configure it: I assume that you already had the configurations on your keycloak instance, as for example, a client created with their configurations related (scopes and etc.)
 Starting from this point, to use **Feijuca.Keycloak.Auth.MultiTenancy** follow the steps below:
-1. The tenant that each user belongs is stored on a user attribute, the tenant value should be the name of the realm. You can create a new attribute manually or using **Feijuca.Keycloak.TokenManager** you can create a user with these  default attributes below:
+
+1. The tenant that each user belongs is stored on a user attribute, the tenant value should be the name of the realm. You can create a new attribute manually on Keycloak or using **Feijuca.Keycloak.TokenManager** you can create news users with these default attributes below:
+   
 ![image](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/assets/27566574/8dcf2109-2145-4e53-9487-ab8fe2582fff)
 
-2. Create a new audience related to the scopes from your client and include this audience on your client:
-This step is mandatory because on each request received the tool will validate the tokena audience following what was filled out on step 3.
+2. Create a new audience related to the scopes used your client and include the audience on your client:
+
 ![image](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/assets/27566574/6b7b437e-fa29-4776-b29f-4dba8e6d1f21)
+
+This step is important and mandatory because on each request received the tool will confirm the token audience following what was filled out on step 3.
 
 3. Filled out appsettings file on your application, relate all of yours realms (tenants)
    ```sh
@@ -98,6 +101,31 @@ This step is mandatory because on each request received the tool will validate t
         }
     }
    ```
+6. Conclusion:
+   Following a default example, after generated, your token should have the following details:
+   Audience(s) related to the clients scopes:
+   
+    ![image](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/assets/27566574/18da7c8b-81f7-4bd7-b794-8eb768db9d18)
+   
+   And your appsettings should be:
+   ```sh   
+   "AuthSettings": {
+      "Realms": [
+        {
+          "Name": "10000",
+          "Audience": "receipts-commandhander-api",
+          "Issuer": "https://url-keycloak/realms/10000"
+        }
+      ],
+      "ClientId": "receipts-commandhander-api",
+      "Resource": "receipts-commandhander-api",
+      "AuthServerUrl": "https://url-keycloak",      
+    }
+   ```
+   With this configuration you should be able to use Keycloak following a multi tenancy contenxt using .NET.
+   Following this [link](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/blob/main/src/Feijuca.Keycloak.Auth.MultiTenancy/Feijuca.Keycloak.MultiTenancy/Extensions/AuthExtensions.cs) you can understand what is the logic used to validate the token received.
+
+  
  
 ## Getting Started - Using Token Manager Api
 If you wish use  to accomplish the goal to use multi tenancy concept based on each realm on your keycloak instance, here is the steps to configure it:
