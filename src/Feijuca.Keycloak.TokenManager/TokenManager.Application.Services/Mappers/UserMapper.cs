@@ -14,10 +14,10 @@ namespace TokenManager.Application.Services.Mappers
 
         public static Attributes ToDomain(this AttributesRequest attributes)
         {
-            return new Attributes(attributes.ZoneInfo, attributes.Birthdate, attributes.PhoneNumber, attributes.Gender, attributes.Fullname, attributes.Tenant, attributes.Picture);
+            return new Attributes(attributes.Tenant, attributes.UserAttributes);
         }
 
-        public static User ToDomain(this LoginUserRequest loginUserRequest, string tenant)
+        public static User ToDomain(this LoginUserRequest loginUserRequest)
         {
             return new User(loginUserRequest.Username, loginUserRequest.Password);
         }
@@ -29,7 +29,8 @@ namespace TokenManager.Application.Services.Mappers
                 AccessToken = tokenDetails.Access_Token,
                 ExpiresIn = tokenDetails.Expires_In,
                 RefreshToken = tokenDetails.Refresh_Token,
-                RefreshExpiresIn = tokenDetails.Refresh_Expires_In
+                RefreshExpiresIn = tokenDetails.Refresh_Expires_In,
+                TokenType = tokenDetails.Token_Type,
             };
         }
     }

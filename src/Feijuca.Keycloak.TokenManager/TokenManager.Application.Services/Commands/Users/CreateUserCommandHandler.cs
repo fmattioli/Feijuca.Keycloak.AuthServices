@@ -1,6 +1,8 @@
 ﻿using Contracts.Common;
 using MediatR;
 using TokenManager.Application.Services.Mappers;
+using TokenManager.Domain.Entities;
+using TokenManager.Domain.Errors;
 using TokenManager.Domain.Interfaces;
 
 namespace TokenManager.Application.Services.Commands.Users
@@ -11,13 +13,28 @@ namespace TokenManager.Application.Services.Commands.Users
 
         public async Task<Result> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
-            var resultUserCreated = await _userRepository.CreateNewUserActions(request.Tenant, request.AddUserRequest.ToDomain());
-            if (resultUserCreated.IsSuccess)
+            var accessTokenResult = await _userRepository.GetAccessTokenAsync(request.Tenant);
+            if (accessTokenResult.IsSuccess)
             {
-                return Result.Success();
+                var user = request.AddUserRequest.ToDomain();
+                var(IsSuccessStatusCode, contentRequest) = await _userRepository.CreateNewUserAsync(user);
+                if (IsSuccessStatusCode)
+                {
+                    await SetUserPasswordAsync(user);
+                    return Result.Success();
+                }
+
+                UserErrors.SetTechnicalMessage(contentRequest);
+                return Result.Failure(UserErrors.TokenGenerationError);
             }
 
-            return Result.Failure(resultUserCreated.Error);
+            return Result.Failure(UserErrors.InvalidUserNameOrPasswordError);
+        }
+
+        private async Task SetUserPasswordAsync(User user)
+        {
+            var keycloakUser = await _userRepository.GetUserAsync(user.Username!);
+            await _userRepository.ResetPasswordAsync(keycloakUser.Value.Id!, user.Password!);
         }
     }
 }

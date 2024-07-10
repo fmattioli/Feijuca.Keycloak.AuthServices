@@ -14,7 +14,6 @@ namespace TokenManager.Infra.Data.Repositories
     public class UserRepository : IUserRepository
     {
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IAuthService _authService;
         private readonly TokenCredentials _tokenCredentials;
         private readonly HttpClient _httpClient;
         private string _urlUserActions = "";
@@ -24,10 +23,9 @@ namespace TokenManager.Infra.Data.Repositories
             NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore
         };
 
-        public UserRepository(IHttpClientFactory httpClientFactory, IAuthService authService, TokenCredentials tokenCredentials)
+        public UserRepository(IHttpClientFactory httpClientFactory, TokenCredentials tokenCredentials)
         {
             _httpClientFactory = httpClientFactory;
-            _authService = authService;
             _tokenCredentials = tokenCredentials;
             _httpClient = _httpClientFactory.CreateClient("KeycloakClient");
         }        
@@ -51,9 +49,12 @@ namespace TokenManager.Infra.Data.Repositories
             var response = await _httpClient.PostAsync(url, requestData);
 
             if (response.IsSuccessStatusCode)
-            {
+            {                
                 var content = await response.Content.ReadAsStringAsync();
-                var result = JsonConvert.DeserializeObject<TokenDetails>(content);
+                var result = JsonConvert.DeserializeObject<TokenDetails>(content)!;
+
+                SetAuthorizationHeader(result.Access_Token);
+
                 return Result<TokenDetails>.Success(result!);
             }
 
@@ -61,37 +62,15 @@ namespace TokenManager.Infra.Data.Repositories
             UserErrors.SetTechnicalMessage(responseMessage);
             return Result<TokenDetails>.Failure(UserErrors.TokenGenerationError);
         }
-
-        public async Task<Result> CreateNewUserActions(string tenant, User user)
+       
+        public async Task<(bool result, string content)> CreateNewUserAsync(User user)
         {
-            var tokenBearerResult = await GetAccessTokenAsync(tenant);
-            if (tokenBearerResult.IsSuccess)
-            {
-                ConfigureHttpClient(tenant, tokenBearerResult.Value.Access_Token);
+            SetBaseUrlUserAction(user!.Attributes!.Tenant!);
 
-                var response = await CreateNewUserAsync(user);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var keycloakUser = await GetUserAsync(user.Username!);
-                    await ResetPasswordAsync(keycloakUser.Value.Id!, user.Password!);
-                    return Result.Success();
-                }
-
-                var responseMessage = await response.Content.ReadAsStringAsync();
-                UserErrors.SetTechnicalMessage(responseMessage);
-                return Result.Failure(UserErrors.TokenGenerationError);
-            }
-
-            return Result.Failure(UserErrors.InvalidUserNameOrPasswordError);
-        }        
-
-        public async Task<HttpResponseMessage> CreateNewUserAsync(User user)
-        {
             var json = JsonConvert.SerializeObject(user, Settings);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync(_urlUserActions, httpContent);
-            return response;
+            return (response.IsSuccessStatusCode, await response.Content.ReadAsStringAsync());
         }
 
         public async Task<Result<User>> GetUserAsync(string userName)
@@ -189,15 +168,18 @@ namespace TokenManager.Infra.Data.Repositories
             return Result<TokenDetails>.Failure(UserErrors.InvalidUserNameOrPasswordError);
         }
 
-        private void ConfigureHttpClient(string tenant, string accessToken)
+        private void SetBaseUrlUserAction(string tenant)
         {
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
-
             _urlUserActions = _httpClient.BaseAddress
                     .AppendPathSegment("admin")
                     .AppendPathSegment("realms")
                     .AppendPathSegment(tenant)
                     .AppendPathSegment("users");            
+        }
+
+        private void SetAuthorizationHeader(string accessToken)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
         }
     }
 }
