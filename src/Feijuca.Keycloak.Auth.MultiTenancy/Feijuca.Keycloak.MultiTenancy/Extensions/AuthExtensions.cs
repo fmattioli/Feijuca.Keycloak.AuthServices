@@ -17,122 +17,128 @@ namespace Feijuca.Keycloak.MultiTenancy.Extensions
             var httpClient = new HttpClient();
             var tokenHandler = new JwtSecurityTokenHandler();
 
-            services
-                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddKeycloakWebApi(
-                    options =>
-                    {
-                        options.Resource = authSettings.Resource!;
-                        options.AuthServerUrl = authSettings.AuthServerUrl;
-                        options.VerifyTokenAudience = true;
-                    },
-                    options =>
-                    {
-                        options.Events = new JwtBearerEvents
+            services.AddSingleton<JwtSecurityTokenHandler>()
+                    .AddSingleton(authSettings)
+                    .AddScoped<IAuthService, AuthService>()
+                    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddKeycloakWebApi(
+                        options =>
                         {
-                            OnMessageReceived = async context =>
+                            options.Resource = authSettings.Resource!;
+                            options.AuthServerUrl = authSettings.AuthServerUrl;
+                            options.VerifyTokenAudience = true;
+                        },
+                        options =>
+                        {
+                            options.Events = new JwtBearerEvents
                             {
-                                try
+                                OnMessageReceived = async context =>
                                 {
-                                    var tokenJwt = context.Request.Headers.Authorization.FirstOrDefault();
-
-                                    if (string.IsNullOrEmpty(tokenJwt))
+                                    try
                                     {
-                                        context.HttpContext.Items["AuthError"] = "Invalid JWT token provided! Please check. ";
-                                        context.HttpContext.Items["AuthStatusCode"] = 401;
-                                        return;
+                                        var tokenJwt = context.Request.Headers.Authorization.FirstOrDefault();
+
+                                        if (string.IsNullOrEmpty(tokenJwt))
+                                        {
+                                            context.HttpContext.Items["AuthError"] = "Invalid JWT token provided! Please check. ";
+                                            context.HttpContext.Items["AuthStatusCode"] = 401;
+                                            return;
+                                        }
+
+                                        var bearerToken = tokenJwt.Replace("Bearer ", "");
+                                        var tokenInfos = tokenHandler.ReadJwtToken(tokenJwt.Replace("Bearer ", ""));
+                                        var tenantNumber = tokenInfos.Claims.FirstOrDefault(c => c.Type == "tenant")?.Value;
+                                        var tenantRealm = authSettings.Realms.FirstOrDefault(realm => realm.Name == tenantNumber);
+
+                                        if (tenantRealm is null)
+                                        {
+                                            context.HttpContext.Items["AuthError"] = "This token don't belongs to valid tenant. Please check!";
+                                            context.HttpContext.Items["AuthStatusCode"] = 401;
+                                            context.NoResult();
+                                            return;
+                                        }
+
+                                        var audience = tokenInfos.Claims.FirstOrDefault(c => c.Type == "aud")?.Value;
+                                        if (string.IsNullOrEmpty(audience))
+                                        {
+                                            context.HttpContext.Items["AuthError"] = "Invalid scope provided! Please, check the scopes provided!";
+                                            context.HttpContext.Items["AuthStatusCode"] = 403;
+                                            context.NoResult();
+                                            return;
+                                        }
+
+                                        var jwksUrl = $"{tenantRealm.Issuer}/protocol/openid-connect/certs";
+
+                                        var jwks = await httpClient.GetStringAsync(jwksUrl);
+                                        var jsonWebKeySet = new JsonWebKeySet(jwks);
+
+                                        var tokenValidationParameters = new TokenValidationParameters
+                                        {
+                                            ValidateIssuer = true,
+                                            ValidIssuer = tenantRealm.Issuer,
+                                            ValidateAudience = true,
+                                            ValidAudience = tenantRealm.Audience,
+                                            ValidateLifetime = true,
+                                            ValidateIssuerSigningKey = true,
+                                            IssuerSigningKeys = jsonWebKeySet.Keys
+                                        };
+
+                                        var claims = tokenHandler.ValidateToken(bearerToken, tokenValidationParameters, out var validatedToken);
+                                        context.Principal = claims;
+                                        context.Success();
                                     }
-
-                                    var bearerToken = tokenJwt.Replace("Bearer ", "");
-                                    var tokenInfos = tokenHandler.ReadJwtToken(tokenJwt.Replace("Bearer ", ""));
-                                    var tenantNumber = tokenInfos.Claims.FirstOrDefault(c => c.Type == "tenant")?.Value;
-                                    var tenantRealm = authSettings.Realms.FirstOrDefault(realm => realm.Name == tenantNumber);
-
-                                    if (tenantRealm is null)
+                                    catch (Exception e)
                                     {
-                                        context.HttpContext.Items["AuthError"] = "This token don't belongs to valid tenant. Please check!";
-                                        context.HttpContext.Items["AuthStatusCode"] = 401;
-                                        context.NoResult();
-                                        return;
+                                        context.Response.StatusCode = 500;
+                                        context.HttpContext.Items["AuthError"] = "The following error occurs during the authentication process: " + e.Message;
+                                        context.Fail("");
                                     }
-
-                                    var audience = tokenInfos.Claims.FirstOrDefault(c => c.Type == "aud")?.Value;
-                                    if (string.IsNullOrEmpty(audience))
-                                    {
-                                        context.HttpContext.Items["AuthError"] = "Invalid scope provided! Please, check the scopes provided!";
-                                        context.HttpContext.Items["AuthStatusCode"] = 403;
-                                        context.NoResult();
-                                        return;
-                                    }
-
-                                    var jwksUrl = $"{tenantRealm.Issuer}/protocol/openid-connect/certs";
-
-                                    var jwks = await httpClient.GetStringAsync(jwksUrl);
-                                    var jsonWebKeySet = new JsonWebKeySet(jwks);
-
-                                    var tokenValidationParameters = new TokenValidationParameters
-                                    {
-                                        ValidateIssuer = true,
-                                        ValidIssuer = tenantRealm.Issuer,
-                                        ValidateAudience = true,
-                                        ValidAudience = tenantRealm.Audience,
-                                        ValidateLifetime = true,
-                                        ValidateIssuerSigningKey = true,
-                                        IssuerSigningKeys = jsonWebKeySet.Keys
-                                    };
-
-                                    var claims = tokenHandler.ValidateToken(bearerToken, tokenValidationParameters, out var validatedToken);
-                                    context.Principal = claims;
-                                    context.Success();
-                                }
-                                catch (Exception e)
+                                },
+                                OnAuthenticationFailed = async context =>
                                 {
-                                    context.Response.StatusCode = 500;
-                                    context.HttpContext.Items["AuthError"] = "The following error occurs during the authentication process: " + e.Message;
-                                    context.Fail("");
-                                }
-                            },
-                            OnAuthenticationFailed = async context =>
-                            {
-                                var errorDescription = context.Exception.Message;
-                                context.Response.StatusCode = 401;
-                                context.Response.ContentType = "application/json";
-                                await context.Response.WriteAsJsonAsync(errorDescription);
-                            },
-                            OnChallenge = async context =>
-                            {
-                                if (!context.Response.HasStarted)
-                                {
-                                    var errorMessage = context.HttpContext.Items["AuthError"] as string ?? "Authentication failed!";
-                                    var statusCode = context.HttpContext.Items["AuthStatusCode"] as int? ?? 401;
-                                    var responseMessage = new { Message = errorMessage };
-                                    context.Response.StatusCode = statusCode;
+                                    var errorDescription = context.Exception.Message;
+                                    context.Response.StatusCode = 401;
                                     context.Response.ContentType = "application/json";
-                                    await context.Response.WriteAsJsonAsync(responseMessage);
+                                    await context.Response.WriteAsJsonAsync(errorDescription);
+                                },
+                                OnChallenge = async context =>
+                                {
+                                    if (!context.Response.HasStarted)
+                                    {
+                                        var errorMessage = context.HttpContext.Items["AuthError"] as string ?? "Authentication failed!";
+                                        var statusCode = context.HttpContext.Items["AuthStatusCode"] as int? ?? 401;
+                                        var responseMessage = new { Message = errorMessage };
+                                        context.Response.StatusCode = statusCode;
+                                        context.Response.ContentType = "application/json";
+                                        await context.Response.WriteAsJsonAsync(responseMessage);
+                                    }
+                                    context.HandleResponse();
                                 }
-                                context.HandleResponse();
-                            }
-                        };
-                    }
-                );
+                            };
+                        }
+                    );
 
             services
                 .AddAuthorization()
-                .AddKeycloakAuthorization()
-                .AddAuthorizationBuilder()
-                .AddPolicy(
-                    authSettings.PolicyName!,
-                    policy =>
-                    {
-                        policy.RequireResourceRolesForClient(
-                            authSettings!.Resource!,
-                            authSettings!.Roles!.ToArray());
-                    }
-                );
+                .AddKeycloakAuthorization();
 
-            services.AddSingleton<JwtSecurityTokenHandler>()
-                    .AddSingleton(authSettings)
-                    .AddScoped<IAuthService, AuthService>();
+            if (!string.IsNullOrEmpty(authSettings?.PolicyName))
+            {
+                services.AddAuthorizationBuilder()
+                    .AddPolicy(
+                        authSettings.PolicyName,
+                        policy =>
+                        {
+                            policy.RequireResourceRolesForClient(
+                                authSettings.Resource!,
+                                authSettings.Roles!.ToArray());
+                        }
+                    );
+            }
+            else
+            {
+                services.AddAuthorizationBuilder();
+            }
 
             return services;
         }

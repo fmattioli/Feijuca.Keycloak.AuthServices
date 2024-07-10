@@ -2,14 +2,14 @@
 {
     public class AuthSettings
     {
-        public string? ClientId { get; set; }
-        public string? ClientSecret { get; set; }
-        public string? Resource { get; set; }
-        public string? AuthServerUrl { get; set; }
+        public required string ClientId { get; set; }
+        public required string ClientSecret { get; set; }
+        public required string Resource { get; set; }
+        public required string AuthServerUrl { get; set; }
+        public required IEnumerable<Realm> Realms { get; set; }
         public string? PolicyName { get; set; }
-        public IEnumerable<string> Roles { get; set; } = [];
-        public IEnumerable<string> Scopes { get; set; } = [];
-        public IEnumerable<Realm> Realms { get; set; } = [];
+        public IEnumerable<string>? Roles { get; set; } = [];
+        public IEnumerable<string>? Scopes { get; set; } = [];
     }
 
     public class Realm
