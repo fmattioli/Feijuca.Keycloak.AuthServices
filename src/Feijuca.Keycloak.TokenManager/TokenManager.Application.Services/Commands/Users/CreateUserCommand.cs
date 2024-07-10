@@ -4,5 +4,5 @@ using TokenManager.Application.Services.Requests.User;
 
 namespace TokenManager.Application.Services.Commands.Users
 {
-    public record CreateUserCommand(AddUserRequest AddUserRequest) : IRequest<Result>;
+    public record CreateUserCommand(string Tenant, AddUserRequest AddUserRequest) : IRequest<Result>;
 }

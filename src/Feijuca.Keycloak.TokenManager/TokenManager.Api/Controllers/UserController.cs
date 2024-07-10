@@ -23,10 +23,11 @@ namespace TokenManager.Api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        //[Authorize(Policy = "TokenManager")]
+        //[RequiredScope("tokenmanager-read")]
         public async Task<IActionResult> CreateUser([FromRoute] string tenant, [FromBody] AddUserRequest addUserRequest, CancellationToken cancellationToken)
         {
-            addUserRequest.Tenant = tenant;
-            var result = await _mediator.Send(new CreateUserCommand(addUserRequest), cancellationToken);
+            var result = await _mediator.Send(new CreateUserCommand(tenant, addUserRequest), cancellationToken);
 
             var response = new ResponseResult<string>();
             if (result.IsSuccess)
@@ -46,22 +47,20 @@ namespace TokenManager.Api.Controllers
         /// </summary>
         /// <returns>A status code related to the operation.</returns>
         [HttpPost]
-        [Route("login", Name = nameof(Login))]
+        [Route("login/{tenant}", Name = nameof(Login))]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [Authorize(Policy = "TokenManager")]
-        [RequiredScope("tokenmanager-read")]
-        public async Task<IActionResult> Login([FromBody] LoginUserRequest loginUserRequest, CancellationToken cancellationToken)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]        
+        public async Task<IActionResult> Login([FromRoute] string tenant, [FromBody] LoginUserRequest loginUserRequest, CancellationToken cancellationToken)
         {
-            var result = await _mediator.Send(new LoginUserCommand(loginUserRequest), cancellationToken);
+            var result = await _mediator.Send(new LoginUserCommand(tenant, loginUserRequest), cancellationToken);
 
             var response = new ResponseResult<TokenResponse>();
             if (result.IsSuccess)
             {
                 response.Result = result.Value;
                 response.DetailMessage = "Token generated with succesfully";
-                return Created();
+                return Ok(response);
             }
 
             response.DetailMessage = result.Error.Description;

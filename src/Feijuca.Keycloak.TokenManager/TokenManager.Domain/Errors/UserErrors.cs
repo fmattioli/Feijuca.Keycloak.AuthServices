@@ -16,6 +16,11 @@ namespace TokenManager.Domain.Errors
             $"An error occurred while trying to get JWT token. Please check username and password. {TechnicalMessage}"
         );
 
+        public static Error WrongPasswordDefinition => new(
+            "User.WrongPasswordDefinition",
+            $"An error occurred while trying to add a new password to the user. {TechnicalMessage}"
+        );
+
         public static void SetTechnicalMessage(string technicalMessage)
         {
             TechnicalMessage = technicalMessage;

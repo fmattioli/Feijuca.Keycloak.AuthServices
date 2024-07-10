@@ -1,4 +1,6 @@
-﻿namespace TokenManager.Application.Services.Requests.User
+﻿using Newtonsoft.Json;
+
+namespace TokenManager.Application.Services.Requests.User
 {
     public record LoginUserRequest(string Username, string Password);
 }
