@@ -4,7 +4,6 @@
     {
         public required string ClientId { get; set; }
         public required string ClientSecret { get; set; }
-        public required string Resource { get; set; }
         public required string AuthServerUrl { get; set; }
         public required IEnumerable<Realm> Realms { get; set; }
         public string? PolicyName { get; set; }

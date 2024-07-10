@@ -24,7 +24,7 @@ namespace Feijuca.Keycloak.MultiTenancy.Extensions
                     .AddKeycloakWebApi(
                         options =>
                         {
-                            options.Resource = authSettings.Resource!;
+                            options.Resource = authSettings.ClientId;
                             options.AuthServerUrl = authSettings.AuthServerUrl;
                             options.VerifyTokenAudience = true;
                         },
@@ -130,7 +130,7 @@ namespace Feijuca.Keycloak.MultiTenancy.Extensions
                         policy =>
                         {
                             policy.RequireResourceRolesForClient(
-                                authSettings.Resource!,
+                                authSettings.ClientId,
                                 authSettings.Roles!.ToArray());
                         }
                     );
