@@ -36,70 +36,80 @@ With **Feijuca.Keycloak.TokenManager**, you can create a user in a single reques
 - Custom endpoints based on your necessities (If you think it could be helpful to the project, open a PR to discuss additional features).
 
 ## Getting Started - Multi tenancy configuration
-To accomplish the goal to use multi tenancy concept based on each realm (Where each realm would be a different tenant), here is the steps to configure it: I assume that you already had the configurations on your keycloak instance, as for example, a client created with their configurations related (scopes and etc.)
-Starting from this point, to use **Feijuca.Keycloak.Auth.MultiTenancy** follow the steps below:
 
-1. The tenant that each user belongs is stored on a user attribute, the tenant value should be the name of the realm. You can create a new attribute manually on Keycloak or using **Feijuca.Keycloak.TokenManager** you can create news users with these default attributes below:
-   
-![image](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/assets/27566574/8dcf2109-2145-4e53-9487-ab8fe2582fff)
+- Prerequisites
+     It is assumed that you already have your Keycloak instance configured, including the creation of clients with their respective settings (scopes, etc.).
+  
+- Keycloak configuration steps:
+   - 1. **Storing the Tenant in the User Attribute:**
+        Each user should have an attribute that indicates which tenant they belong to.
+        The value of this attribute should be the name of the corresponding realm. It can be a number or a string, according to your preference.
+        
+   - 2. **Creating the Attribute:**
+        You can create this attribute manually in Keycloak or use Feijuca.Keycloak.TokenManager to create new users with this default attribute.     
+        ![image](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/assets/27566574/8dcf2109-2145-4e53-9487-ab8fe2582fff)
+        
+   - 3. Audience:
+        Create a new audience related to the scopes used your client and include the audience on your client:
+        ![image](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/assets/27566574/6b7b437e-fa29-4776-b29f-4dba8e6d1f21)
+        **This step is important and mandatory because on each request received the tool will confirm the token audience following what was filled out on step 3.**
 
-2. Create a new audience related to the scopes used your client and include the audience on your client:
-
-![image](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/assets/27566574/6b7b437e-fa29-4776-b29f-4dba8e6d1f21)
-
-This step is important and mandatory because on each request received the tool will confirm the token audience following what was filled out on step 3.
-
-3. Filled out appsettings file on your application, relate all of yours realms (tenants)
-   ```sh
-   {
-      "AuthSettings": {
-         "Realms": [
-            {
-               "Name": "yourTenantName1",
-               "Audience": "your-audience",
-               "Issuer": "https://url-keycloakt/realms/yourTenantName1"
-            },
-            {
-               "Name": "yourTenantName2",
-               "Audience": "your-audience",
-               "Issuer": "https://url-keycloakt/realms/yourTenantName2"
-            },
-            {
-               "Name": "yourTenantName3",
-               "Audience": "documents-processor-api",
-               "Issuer": "https://url-keycloakt/realms/yourTenantName3"
-            }
-      ],
-      "ClientSecret": "your-client-secret",
-      "ClientId": "your-client-id",
-      "Resource": "your-client-id",
-      "AuthServerUrl": "https://url-keycloak"
+- Project configurations steps:
+   - 4. Appsettings.json
+        Filled out appsettings file on your application, relate all of yours realms (tenants)
+      ```sh
+      {
+         "AuthSettings": {
+            "Realms": [
+               {
+                  "Name": "yourTenantName1",
+                  "Audience": "your-audience",
+                  "Issuer": "https://url-keycloakt/realms/yourTenantName1"
+               },
+               {
+                  "Name": "yourTenantName2",
+                  "Audience": "your-audience",
+                  "Issuer": "https://url-keycloakt/realms/yourTenantName2"
+               },
+               {
+                  "Name": "yourTenantName3",
+                  "Audience": "documents-processor-api",
+                  "Issuer": "https://url-keycloakt/realms/yourTenantName3"
+               }
+         ],
+         "ClientSecret": "your-client-secret",
+         "ClientId": "your-client-id",
+         "Resource": "your-client-id",
+         "AuthServerUrl": "https://url-keycloak"
+         }
       }
-   }
-   ```
-4. Configure dependency injection (Note that AuthSettings is a model defined on **Feijuca.Keycloak.Auth.MultiTenancy**, I recommend you use the GetSection method to map the appsettings configs to the AuthSettings model:
-   ```sh
-   var settings = configuration.GetSection("AuthSettings").Get<AuthSettings>();
-   ```
-   
-5. Add the service to the service collection from your application, I recommend you create a new extension method as below:
-   ```sh   
-   builder.Services
-    .AddApiAuthentication(applicationSettings.AuthSettings!);
-   
-   public static class AuthExtension
-    {
-        public static IServiceCollection AddApiAuthentication(this IServiceCollection services, AuthSettings authSettings)
-        {
-            services.AddHttpContextAccessor();
-            services.AddSingleton<JwtSecurityTokenHandler>();
-            services.AddKeyCloakAuth(authSettings!);
+      ```
 
-            return services;
-        }
-    }
-   ```
-6. Conclusion:
+- 5. Configure dependency
+      Map appsettings configurations values (Note that AuthSettings is a model defined on **Feijuca.Keycloak.Auth.MultiTenancy**, I recommend you use the GetSection method to map the appsettings configs to the AuthSettings model:
+      ```sh
+      var settings = configuration.GetSection("AuthSettings").Get<AuthSettings>();
+      ```
+   
+     Add the service to the service collection from your application, I recommend you create a new extension method as below:
+  
+      ```sh   
+      builder.Services
+       .AddApiAuthentication(applicationSettings.AuthSettings!);
+      
+      public static class AuthExtension
+       {
+           public static IServiceCollection AddApiAuthentication(this IServiceCollection services, AuthSettings authSettings)
+           {
+               services.AddHttpContextAccessor();
+               services.AddSingleton<JwtSecurityTokenHandler>();
+               services.AddKeyCloakAuth(authSettings!);
+   
+               return services;
+           }
+       }
+      ```
+- 6. Conclusion:
    Following a default example, after generated, your token should have the following details:
    Audience(s) related to the clients scopes:
    
