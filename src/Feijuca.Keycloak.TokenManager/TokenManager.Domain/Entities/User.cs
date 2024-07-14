@@ -19,7 +19,7 @@ namespace TokenManager.Domain.Entities
         public int NotBefore { get; set; }
         public long CreatedTimestamp { get; set; }
         public Access? Access { get; set; }
-        public Attributes? Attributes { get; set; }
+        public Dictionary<string, string[]>? Attributes { get; set; }
 
         public User()
         {
@@ -32,7 +32,7 @@ namespace TokenManager.Domain.Entities
             Password = password;
         }
 
-        public User(string userName, string password, string email, string firstName, string lastName, Attributes attributes)
+        public User(string userName, string password, string email, string firstName, string lastName, Dictionary<string, string[]> attributes)
         {
             Enabled = true;
             EmailVerified = true;            

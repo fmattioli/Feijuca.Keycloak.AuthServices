@@ -12,7 +12,7 @@ namespace TokenManager.Application.Services.Commands.Users
 
         public async Task<Result<TokenResponse>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
         {
-            var user = request.LoginUser.ToDomain(request.Tenant);
+            var user = request.LoginUser.ToDomain();
             var tokenDetailsResult = await _userRepository.LoginAsync(request.Tenant, user);
             if (tokenDetailsResult.IsSuccess)
             {

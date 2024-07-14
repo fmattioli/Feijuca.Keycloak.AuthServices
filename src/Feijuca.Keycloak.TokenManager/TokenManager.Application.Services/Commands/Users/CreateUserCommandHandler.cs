@@ -13,11 +13,13 @@ namespace TokenManager.Application.Services.Commands.Users
 
         public async Task<Result> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
+            AddTenantToRequest(request);
             var accessTokenResult = await _userRepository.GetAccessTokenAsync(request.Tenant);
             if (accessTokenResult.IsSuccess)
             {
                 var user = request.AddUserRequest.ToDomain();
-                var(IsSuccessStatusCode, contentRequest) = await _userRepository.CreateNewUserAsync(user);
+
+                var (IsSuccessStatusCode, contentRequest) = await _userRepository.CreateNewUserAsync(request.Tenant, user);
                 if (IsSuccessStatusCode)
                 {
                     await SetUserPasswordAsync(user);
@@ -25,10 +27,15 @@ namespace TokenManager.Application.Services.Commands.Users
                 }
 
                 UserErrors.SetTechnicalMessage(contentRequest);
-                return Result.Failure(UserErrors.TokenGenerationError);
+                return Result.Failure(UserErrors.WrongPasswordDefinition);
             }
 
-            return Result.Failure(UserErrors.InvalidUserNameOrPasswordError);
+            return Result.Failure(UserErrors.TokenGenerationError);
+        }
+
+        private static void AddTenantToRequest(CreateUserCommand request)
+        {
+            request.AddUserRequest.Attributes.Add("tenant", [request.Tenant]);
         }
 
         private async Task SetUserPasswordAsync(User user)

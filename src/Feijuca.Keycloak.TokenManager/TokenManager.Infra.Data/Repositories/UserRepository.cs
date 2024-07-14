@@ -1,5 +1,4 @@
 ﻿using Contracts.Common;
-using Feijuca.Keycloak.MultiTenancy.Services;
 using Flurl;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -63,9 +62,9 @@ namespace TokenManager.Infra.Data.Repositories
             return Result<TokenDetails>.Failure(UserErrors.TokenGenerationError);
         }
        
-        public async Task<(bool result, string content)> CreateNewUserAsync(User user)
+        public async Task<(bool result, string content)> CreateNewUserAsync(string tenant, User user)
         {
-            SetBaseUrlUserAction(user!.Attributes!.Tenant!);
+            SetBaseUrlUserAction(tenant);
 
             var json = JsonConvert.SerializeObject(user, Settings);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
