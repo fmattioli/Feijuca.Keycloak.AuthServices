@@ -18,7 +18,15 @@ namespace Feijuca.Keycloak.MultiTenancy.Services
             return tenantClaim;
         }
 
-        public Guid GetUserFromToken()
+        public string GetInfoFromToken(string infoName)
+        {
+            string jwtToken = GetToken();
+            var tokenInfos = _tokenHandler.ReadJwtToken(jwtToken);
+            var userClaim = tokenInfos.Claims.FirstOrDefault(c => c.Type == infoName)?.Value!;
+            return userClaim;
+        }
+
+        public Guid GetUserIdFromToken()
         {
             string jwtToken = GetToken();
             var tokenInfos = _tokenHandler.ReadJwtToken(jwtToken);

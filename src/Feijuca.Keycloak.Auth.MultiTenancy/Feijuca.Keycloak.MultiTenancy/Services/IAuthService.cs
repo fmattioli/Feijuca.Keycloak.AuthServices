@@ -9,6 +9,6 @@ namespace Feijuca.Keycloak.MultiTenancy.Services
         string GetClientSecret();
         string GetServerUrl();
         Realm GetRealm(string realmName);
-        Guid GetUserFromToken();
+        Guid GetUserIdFromToken();
     }
 }
