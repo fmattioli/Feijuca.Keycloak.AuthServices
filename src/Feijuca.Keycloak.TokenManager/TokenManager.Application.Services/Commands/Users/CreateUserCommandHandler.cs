@@ -1,5 +1,4 @@
-﻿using Contracts.Common;
-using MediatR;
+﻿using MediatR;
 using TokenManager.Application.Services.Mappers;
 using TokenManager.Domain.Entities;
 using TokenManager.Domain.Errors;

@@ -1,8 +1,10 @@
-﻿using Contracts.Common;
-using Flurl;
+﻿using Flurl;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+
 using System.Text;
+
 using TokenManager.Domain.Entities;
 using TokenManager.Domain.Errors;
 using TokenManager.Domain.Interfaces;
@@ -149,8 +151,7 @@ namespace TokenManager.Infra.Data.Repositories
                 new KeyValuePair<string, string>("client_id", _tokenCredentials.Client_Id),
                 new KeyValuePair<string, string>("client_secret", _tokenCredentials.Client_Secret),
                 new KeyValuePair<string, string>("username", user.Username!),
-                new KeyValuePair<string, string>("password", user.Password!),
-                new KeyValuePair<string, string>("scope", "tokenmanager-write tokenmanager-read"),
+                new KeyValuePair<string, string>("password", user.Password!)                
             ]);
 
             var response = await _httpClient.PostAsync(urlGetToken, requestData);

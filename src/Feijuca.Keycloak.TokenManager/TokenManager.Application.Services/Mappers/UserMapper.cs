@@ -26,6 +26,7 @@ namespace TokenManager.Application.Services.Mappers
                 RefreshToken = tokenDetails.Refresh_Token,
                 RefreshExpiresIn = tokenDetails.Refresh_Expires_In,
                 TokenType = tokenDetails.Token_Type,
+                Scope = tokenDetails.Scope
             };
         }
     }

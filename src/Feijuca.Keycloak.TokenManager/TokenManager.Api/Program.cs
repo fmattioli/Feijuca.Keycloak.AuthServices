@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using TokenManager.Infra.CrossCutting.Config;
 using TokenManager.Infra.CrossCutting.Extensions;
 using TokenManager.Infra.CrossCutting.Handlers;
@@ -22,7 +21,7 @@ builder.Services
     .AddSingleton<ISettings>(applicationSettings)
     .AddControllers();
 
-builder.Services.AddSwagger(applicationSettings!.AuthSettings!);
+builder.Services.AddSwaggerGen();
 builder.Services
     .AddExceptionHandler<GlobalExceptionHandler>()
     .AddProblemDetails()
@@ -47,12 +46,7 @@ var app = builder.Build();
 app.UseCors("AllowAllOrigins")
    .UseExceptionHandler()
    .UseSwagger()
-   .UseSwaggerUI(c =>
-   {
-       c.SwaggerEndpoint("/swagger/v1/swagger.json", "TokenManager.Api");
-       c.OAuthClientId(applicationSettings!.AuthSettings!.Resource);
-       c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
-   });
+   .UseSwaggerUI();
 
 app.UseHttpsRedirection()
    .UseAuthorization();

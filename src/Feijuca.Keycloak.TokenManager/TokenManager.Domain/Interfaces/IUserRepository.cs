@@ -1,5 +1,4 @@
-﻿using Contracts.Common;
-using TokenManager.Domain.Entities;
+﻿using TokenManager.Domain.Entities;
 
 namespace TokenManager.Domain.Interfaces
 {

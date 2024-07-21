@@ -1,7 +1,7 @@
-﻿using Contracts.Common;
-using MediatR;
+﻿using MediatR;
 using TokenManager.Application.Services.Mappers;
 using TokenManager.Application.Services.Responses;
+using TokenManager.Domain.Entities;
 using TokenManager.Domain.Interfaces;
 
 namespace TokenManager.Application.Services.Commands.Users

@@ -1,6 +1,4 @@
-﻿using Contracts.Web.Attributes;
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TokenManager.Application.Services.Commands.Users;
 using TokenManager.Application.Services.Requests.User;
@@ -23,8 +21,6 @@ namespace TokenManager.Api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[Authorize(Policy = "TokenManager")]
-        //[RequiredScope("tokenmanager-read")]
         public async Task<IActionResult> CreateUser([FromRoute] string tenant, [FromBody] AddUserRequest addUserRequest, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new CreateUserCommand(tenant, addUserRequest), cancellationToken);

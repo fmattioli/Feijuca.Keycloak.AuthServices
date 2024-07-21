@@ -1,4 +1,4 @@
-﻿using Contracts.Common;
+﻿using TokenManager.Domain.Entities;
 
 namespace TokenManager.Domain.Errors
 {

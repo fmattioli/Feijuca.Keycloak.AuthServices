@@ -1,5 +1,4 @@
 ﻿using AutoFixture;
-using Contracts.Common;
 using FluentAssertions;
 using Moq;
 using TokenManager.Application.Services.Commands.Users;
