@@ -35,7 +35,7 @@ With **Feijuca.Keycloak.TokenManager**, you can create a user in a single reques
 - Every action in one place. Forget about call multiples endpoints to do actions about users on keycloak. Do actions related to the user (Creation, remotion, e-mail confirming, password redefinition, and so on) based on predefined endpoints.
 - Custom endpoints based on your necessities (If you think it could be helpful to the project, open a PR to discuss additional features).
 
-## Getting Started
+## Getting Started on Feijuca.Keycloak.Auth.MultiTenancy
 
 - Prerequisites
      It is assumed that you already have your Keycloak instance configured, including the creation of clients with their respective settings (scopes, etc.).
