@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Company>Felipe Mattioli</Company>
-    <Description>This project has a quickly purpose: Extend the behavior of keycloak-authorization-services-dotnet but adding a multi-tenancy support. </Description>
+    <Description>This project aims be a way to use multi tenancy concept using Keycloak, Based on realm concept, each realm could be used as a different tenant. </Description>
     <PackageProjectUrl>https://github.com/fmattioli/Feijuca.Keycloak.MultiTenancyAuthServices/tree/main</PackageProjectUrl>
     <PackageIcon>feijuca.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>

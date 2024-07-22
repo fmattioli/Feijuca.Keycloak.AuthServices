@@ -1,0 +1,6 @@
+@Feijuca.WebApi.Tests_HostAddress = http://localhost:5019
+
+GET {{Feijuca.WebApi.Tests_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

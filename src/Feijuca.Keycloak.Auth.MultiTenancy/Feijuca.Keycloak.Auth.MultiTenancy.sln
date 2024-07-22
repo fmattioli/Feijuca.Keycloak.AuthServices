@@ -5,6 +5,8 @@ VisualStudioVersion = 17.10.34928.147
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Feijuca.Keycloak.MultiTenancy", "Feijuca.Keycloak.MultiTenancy\Feijuca.Keycloak.MultiTenancy.csproj", "{8BC2F8BA-F2C3-4084-9EFB-99228753344C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Feijuca.WebApi.Tests", "Feijuca.WebApi.Tests\Feijuca.WebApi.Tests.csproj", "{D4E31B45-1238-4E33-9795-0F0565B37333}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{8BC2F8BA-F2C3-4084-9EFB-99228753344C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BC2F8BA-F2C3-4084-9EFB-99228753344C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BC2F8BA-F2C3-4084-9EFB-99228753344C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4E31B45-1238-4E33-9795-0F0565B37333}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4E31B45-1238-4E33-9795-0F0565B37333}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4E31B45-1238-4E33-9795-0F0565B37333}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4E31B45-1238-4E33-9795-0F0565B37333}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
