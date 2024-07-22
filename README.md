@@ -27,14 +27,6 @@ A [NuGet](https://www.nuget.org/packages/Feijuca.Keycloak.MultiTenancy) package 
 - With just one instance from your application you can handle different tenants using the same JWT token generation config
 - Obtaining information such as a tenant, user id, url and so on from a token. (If you wanna implement a method do retrieve another thing related to the token, open a PR)
 
-## Feijuca.Keycloak.TokenManager 👨🏽‍💻
-Managing certain actions in Keycloak can be complicated. For instance, creating a new user using the keycloak api involves several steps: obtaining a token, creating the user, setting a password...
-With **Feijuca.Keycloak.TokenManager**, you can create a user in a single request since all necessary actions are already integrated into the project.
-
-### Features ⛲
-- Every action in one place. Forget about call multiples endpoints to do actions about users on keycloak. Do actions related to the user (Creation, remotion, e-mail confirming, password redefinition, and so on) based on predefined endpoints.
-- Custom endpoints based on your necessities (If you think it could be helpful to the project, open a PR to discuss additional features).
-
 ## Getting Started on Feijuca.Keycloak.Auth.MultiTenancy
 
 - Prerequisites
@@ -123,8 +115,17 @@ With **Feijuca.Keycloak.TokenManager**, you can create a user in a single reques
    ```
    With this configuration you should be able to use Keycloak following a multi tenancy contenxt using .NET.
    Following this [link](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/blob/main/src/Feijuca.Keycloak.Auth.MultiTenancy/Feijuca.Keycloak.MultiTenancy/Extensions/AuthExtensions.cs) you can understand what is the logic used to validate the token received.
-
   
+## Feijuca.Keycloak.TokenManager 👨🏽‍💻
+Managing certain actions in the Keycloak API can be complicated. For example, creating a new user involves several steps: obtaining a token, creating the user, setting attributes, and setting a password. Feijuca.Keycloak.TokenManager aims to simplify these processes and abstract the complexity related to Keycloak API calls.
+
+**Feijuca.Keycloak.TokenManager** is an API that abstracts, facilitates and simplifies calls to perform actions in Keycloak.
+Over time, the goal is to encapsulate multiple Keycloak endpoints, making it easier to perform actions that would be more complex using just the Keycloak API.
+
+### Features ⛲
+- Every action in one place. Forget about call multiples endpoints to do actions about users on keycloak. Do actions related to the user (Creation, remotion, e-mail confirming, password redefinition, and so on) based on predefined endpoints.
+- Custom endpoints based on your necessities (If you think it could be helpful to the project, open a PR to discuss additional features).
+
  
 ## Getting Started - Using Token Manager Api
 - Keycloak configuration steps:
