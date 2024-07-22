@@ -40,18 +40,14 @@ With **Feijuca.Keycloak.TokenManager**, you can create a user in a single reques
 - Prerequisites
      It is assumed that you already have your Keycloak instance configured, including the creation of clients with their respective settings (scopes, etc.).
   
-- Keycloak configuration steps:
-   - 1. **Giving permissions to the realm:**
-        To be possible manage users using the Keycloak Api, it is necessary to provide some permissions on your keycloak client.  You can handle it on an existing realm, or you can create a new realm. 
-        You can follow this [link](https://steve-mu.medium.com/create-new-user-in-keycloak-with-admin-restful-api-e6e868b836b4) to understand how provide these permissions.     
-        
-   - 2. **Configuring audience**:
+- Keycloak configuration steps:        
+   - 1. **Configuring audience**:
         Create a new audience related to the scopes used your client and include the audience on your client:
         ![image](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/assets/27566574/6b7b437e-fa29-4776-b29f-4dba8e6d1f21)
         **This step is important and mandatory because on each request received the tool will confirm the token audience**
 
 - Your project configurations steps:
-   - 4. Appsettings.json
+   - 2. Appsettings.json
         Filled out appsettings file on your application, relate all of yours realms (tenants)
       ```sh
       {
@@ -80,7 +76,7 @@ With **Feijuca.Keycloak.TokenManager**, you can create a user in a single reques
       }
       ```
 
-- 5. Configure dependency
+- 3. Configure dependency
       Map appsettings configurations values (Note that AuthSettings is a model defined on **Feijuca.Keycloak.Auth.MultiTenancy**, I recommend you use the GetSection method to map the appsettings configs to the AuthSettings model:
       ```sh
       var settings = configuration.GetSection("AuthSettings").Get<AuthSettings>();
@@ -104,7 +100,7 @@ With **Feijuca.Keycloak.TokenManager**, you can create a user in a single reques
            }
        }
       ```
-- 6. Conclusion:
+- 4. Conclusion:
    Following a default example, after generated, your token should have the following details:
    Audience(s) related to the clients scopes:
    
@@ -131,51 +127,10 @@ With **Feijuca.Keycloak.TokenManager**, you can create a user in a single reques
   
  
 ## Getting Started - Using Token Manager Api
-If you wish use  to accomplish the goal to use multi tenancy concept based on each realm on your keycloak instance, here is the steps to configure it:
-1. Fill out the appsettings configs related to your realms (tenants)
-   ```sh
-   {
-      "AuthSettings": {
-         "Realms": [
-            {
-               "Name": "yourTenantName1",
-               "Audience": "your-audience",
-               "Issuer": "https://url-keycloakt/realms/yourTenantName1"
-            },
-            {
-               "Name": "yourTenantName2",
-               "Audience": "your-audience",
-               "Issuer": "https://url-keycloakt/realms/yourTenantName2"
-            },
-            {
-               "Name": "yourTenantName3",
-               "Audience": "documents-processor-api",
-               "Issuer": "https://url-keycloakt/realms/yourTenantName3"
-            }
-      ],
-      "ClientSecret": "your-client-secret",
-      "ClientId": "your-client-id",
-      "Resource": "your-client-id",
-      "AuthServerUrl": "https://url-keycloakt"
-      }
-   }
-   ```
-2. Configure dependency injection (Note that AuthSettings is a model defined on **Feijuca.Keycloak.Auth.MultiTenancy**, usually I mapped it to variable. for example:
-   ```sh
-   var settings = configuration.GetSection("AuthSettings").Get<AuthSettings>();
-   
-   builder.Services
-    .AddApiAuthentication(applicationSettings.AuthSettings!);
-   
-   public static IServiceCollection AddApiAuthentication(this IServiceCollection services, AuthSettings authSettings)
-   {
-       services.AddHttpContextAccessor();
-       services.AddSingleton<JwtSecurityTokenHandler>();
-       services.AddKeyCloakAuth(authSettings!);
-   
-       return services;
-   }
-   ```
+- Keycloak configuration steps:
+     - 1. **Giving permissions to the realm:**
+        To be possible manage users using the Keycloak Api, it is necessary to provide some permissions on your keycloak client.  You can handle it on an existing realm, or you can create a new realm. 
+        You can follow this [link](https://steve-mu.medium.com/create-new-user-in-keycloak-with-admin-restful-api-e6e868b836b4) to understand how provide these permissions.   
    
 ## Contributing
 This is a project in costant evolution, therefore, if you have some suggestion, enter in contact with me or open a pull request and we can discuss.
