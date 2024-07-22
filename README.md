@@ -35,23 +35,22 @@ With **Feijuca.Keycloak.TokenManager**, you can create a user in a single reques
 - Every action in one place. Forget about call multiples endpoints to do actions about users on keycloak. Do actions related to the user (Creation, remotion, e-mail confirming, password redefinition, and so on) based on predefined endpoints.
 - Custom endpoints based on your necessities (If you think it could be helpful to the project, open a PR to discuss additional features).
 
-## Getting Started - Multi tenancy configuration
+## Getting Started
 
 - Prerequisites
      It is assumed that you already have your Keycloak instance configured, including the creation of clients with their respective settings (scopes, etc.).
   
 - Keycloak configuration steps:
    - 1. **Giving permissions to the realm:**
-        To be possible manage users using Keycloak Api, is necessary allow some permitions on your keycloak client.
-        I recommend you create a new realm to be a specy of lead realm, and give the permitions to this realm. 
-        You can follow this [link](https://steve-mu.medium.com/create-new-user-in-keycloak-with-admin-restful-api-e6e868b836b4) to understand how allowed this permissions.
+        To be possible manage users using the Keycloak Api, it is necessary to provide some permissions on your keycloak client.  You can handle it on an existing realm, or you can create a new realm. 
+        You can follow this [link](https://steve-mu.medium.com/create-new-user-in-keycloak-with-admin-restful-api-e6e868b836b4) to understand how provide these permissions.     
         
    - 2. **Configuring audience**:
         Create a new audience related to the scopes used your client and include the audience on your client:
         ![image](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/assets/27566574/6b7b437e-fa29-4776-b29f-4dba8e6d1f21)
         **This step is important and mandatory because on each request received the tool will confirm the token audience**
 
-- Project configurations steps:
+- Your project configurations steps:
    - 4. Appsettings.json
         Filled out appsettings file on your application, relate all of yours realms (tenants)
       ```sh
@@ -60,23 +59,22 @@ With **Feijuca.Keycloak.TokenManager**, you can create a user in a single reques
             "Realms": [
                {
                   "Name": "yourTenantName1",
-                  "Audience": "your-audience",
+                  "Audience": "your-audience-defined-on-step2",
                   "Issuer": "https://url-keycloakt/realms/yourTenantName1"
                },
                {
                   "Name": "yourTenantName2",
-                  "Audience": "your-audience",
+                  "Audience": "your-audience-defined-on-step2",
                   "Issuer": "https://url-keycloakt/realms/yourTenantName2"
                },
                {
                   "Name": "yourTenantName3",
-                  "Audience": "documents-processor-api",
+                  "Audience": "your-audience-defined-on-step2",
                   "Issuer": "https://url-keycloakt/realms/yourTenantName3"
                }
          ],
-         "ClientSecret": "your-client-secret",
          "ClientId": "your-client-id",
-         "Resource": "your-client-id",
+         "ClientSecret": "your-client-secret",
          "AuthServerUrl": "https://url-keycloak"
          }
       }
