@@ -131,7 +131,7 @@ Over time, the goal is to encapsulate multiple Keycloak endpoints, making it eas
 - Keycloak configuration steps:
      - 1. **Giving permissions to the realm:**
         To be possible manage users using the Keycloak Api, it is necessary to provide some permissions on your keycloak client.  You can handle it on an existing realm, or you can create a new realm. 
-        You can follow this [link](https://steve-mu.medium.com/create-new-user-in-keycloak-with-admin-restful-api-e6e868b836b4) to understand how provide these permissions.   
+        You can follow this [link](https://steve-mu.medium.com/create-new-user-in-keycloak-with-admin-restful-api-e6e868b836b4) to understand how provide these permissions.
    
 ## Contributing
 This is a project in costant evolution, therefore, if you have some suggestion, enter in contact with me or open a pull request and we can discuss.
