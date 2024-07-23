@@ -47,17 +47,17 @@ A [NuGet](https://www.nuget.org/packages/Feijuca.Keycloak.MultiTenancy) package 
             "Realms": [
                {
                   "Name": "yourTenantName1",
-                  "Audience": "your-audience-defined-on-step2",
+                  "Audience": "your-audience-defined-on-step1",
                   "Issuer": "https://url-keycloakt/realms/yourTenantName1"
                },
                {
                   "Name": "yourTenantName2",
-                  "Audience": "your-audience-defined-on-step2",
+                  "Audience": "your-audience-defined,
                   "Issuer": "https://url-keycloakt/realms/yourTenantName2"
                },
                {
                   "Name": "yourTenantName3",
-                  "Audience": "your-audience-defined-on-step2",
+                  "Audience": "your-audience-defined",
                   "Issuer": "https://url-keycloakt/realms/yourTenantName3"
                }
          ],
