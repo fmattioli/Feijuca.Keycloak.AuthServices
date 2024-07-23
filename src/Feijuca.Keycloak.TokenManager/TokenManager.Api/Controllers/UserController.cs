@@ -24,18 +24,15 @@ namespace TokenManager.Api.Controllers
         public async Task<IActionResult> CreateUser([FromRoute] string tenant, [FromBody] AddUserRequest addUserRequest, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new CreateUserCommand(tenant, addUserRequest), cancellationToken);
-
-            var response = new ResponseResult<string>();
+            
             if (result.IsSuccess)
             {
-                response.Result = addUserRequest.Username;
-                response.DetailMessage = "User created successfully";
+                var response = ResponseResult<string>.Success("User created successfully");
                 return Created("/createUser", response);
             }
 
-            response.Result = "Some error occured while trying executing the operation";
-            response.DetailMessage = result.Error.Description;
-            return BadRequest(response);
+            var responseError = ResponseResult<string>.Failure(result.Error);
+            return BadRequest(responseError);
         }
 
         /// <summary>
@@ -50,17 +47,38 @@ namespace TokenManager.Api.Controllers
         public async Task<IActionResult> Login([FromRoute] string tenant, [FromBody] LoginUserRequest loginUserRequest, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new LoginUserCommand(tenant, loginUserRequest), cancellationToken);
-
-            var response = new ResponseResult<TokenResponse>();
+            
             if (result.IsSuccess)
             {
-                response.Result = result.Value;
-                response.DetailMessage = "Token generated with succesfully";
+                var response = ResponseResult<TokenDetailsResponse>.Success(result.Result);
                 return Ok(response);
             }
 
-            response.DetailMessage = result.Error.Description;
-            return BadRequest(response);
+            var responseError = ResponseResult<TokenDetailsResponse>.Failure(result.Error);
+            return BadRequest(responseError);
+        }
+
+        /// <summary>
+        /// Return a valid JWT token and details about them refreshed.
+        /// </summary>
+        /// <returns>A status code related to the operation.</returns>
+        [HttpPost]
+        [Route("refreshToken/{tenant}", Name = nameof(RefreshToken))]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> RefreshToken([FromRoute] string tenant, [FromBody] string refreshToken, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new RefreshTokenCommand(tenant, refreshToken), cancellationToken);
+
+            if (result.IsSuccess)
+            {
+                var response = ResponseResult<TokenDetailsResponse>.Success(result.Result);
+                return Ok(response);
+            }
+
+            var responseError = ResponseResult<TokenDetailsResponse>.Failure(result.Error);
+            return BadRequest(responseError);
         }
     }
 }

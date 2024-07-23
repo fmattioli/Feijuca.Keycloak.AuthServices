@@ -6,6 +6,7 @@ namespace TokenManager.Domain.Interfaces
     {
         Task<Result<TokenDetails>> GetAccessTokenAsync(string tenant);
         Task<Result<TokenDetails>> LoginAsync(string tenant, User user);
+        Task<Result<TokenDetails>> RefreshTokenAsync(string tenant, string refreshToken);
         Task<(bool result, string content)> CreateNewUserAsync(string tenant, User user);
         Task<Result<User>> GetUserAsync(string userName);
         Task<Result> ResetPasswordAsync(string userId, string password);

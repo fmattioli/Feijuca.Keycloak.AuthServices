@@ -1,10 +1,7 @@
 ﻿using Flurl;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-
 using System.Text;
-
 using TokenManager.Domain.Entities;
 using TokenManager.Domain.Errors;
 using TokenManager.Domain.Interfaces;
@@ -63,7 +60,68 @@ namespace TokenManager.Infra.Data.Repositories
             UserErrors.SetTechnicalMessage(responseMessage);
             return Result<TokenDetails>.Failure(UserErrors.TokenGenerationError);
         }
-       
+
+        public async Task<Result<TokenDetails>> LoginAsync(string tenant, User user)
+        {
+            var urlGetToken = _httpClient.BaseAddress.AppendPathSegment("realms")
+                .AppendPathSegment(tenant)
+                .AppendPathSegment("protocol")
+                .AppendPathSegment("openid-connect")
+                .AppendPathSegment("token");
+
+            var requestData = new FormUrlEncodedContent(
+            [
+                new KeyValuePair<string, string>("grant_type", "password"),
+                new KeyValuePair<string, string>("client_id", _tokenCredentials.Client_Id),
+                new KeyValuePair<string, string>("client_secret", _tokenCredentials.Client_Secret),
+                new KeyValuePair<string, string>("username", user.Username!),
+                new KeyValuePair<string, string>("password", user.Password!)
+            ]);
+
+            var response = await _httpClient.PostAsync(urlGetToken, requestData);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<TokenDetails>(content);
+                return Result<TokenDetails>.Success(result!);
+            }
+
+            var responseMessage = await response.Content.ReadAsStringAsync();
+            UserErrors.SetTechnicalMessage(responseMessage);
+            return Result<TokenDetails>.Failure(UserErrors.InvalidUserNameOrPasswordError);
+        }
+
+        public async Task<Result<TokenDetails>> RefreshTokenAsync(string tenant, string refreshToken)
+        {
+            var urlGetToken = _httpClient.BaseAddress.AppendPathSegment("realms")
+                .AppendPathSegment(tenant)
+                .AppendPathSegment("protocol")
+                .AppendPathSegment("openid-connect")
+                .AppendPathSegment("token");
+
+            var requestData = new FormUrlEncodedContent(
+            [
+                new KeyValuePair<string, string>("grant_type", "refresh_token"),
+                new KeyValuePair<string, string>("client_id", _tokenCredentials.Client_Id),
+                new KeyValuePair<string, string>("client_secret", _tokenCredentials.Client_Secret),
+                new KeyValuePair<string, string>("refresh_token", refreshToken),
+            ]);
+
+            var response = await _httpClient.PostAsync(urlGetToken, requestData);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<TokenDetails>(content);
+                return Result<TokenDetails>.Success(result!);
+            }
+
+            var responseMessage = await response.Content.ReadAsStringAsync();
+            UserErrors.SetTechnicalMessage(responseMessage);
+            return Result<TokenDetails>.Failure(UserErrors.InvalidUserNameOrPasswordError);
+        }
+
         public async Task<(bool result, string content)> CreateNewUserAsync(string tenant, User user)
         {
             SetBaseUrlUserAction(tenant);
@@ -135,38 +193,7 @@ namespace TokenManager.Infra.Data.Repositories
             var responseMessage = await response.Content.ReadAsStringAsync();
             UserErrors.SetTechnicalMessage(responseMessage);
             return Result.Failure(UserErrors.InvalidUserNameOrPasswordError);
-        }
-
-        public async Task<Result<TokenDetails>> LoginAsync(string tenant, User user)
-        {
-            var urlGetToken = _httpClient.BaseAddress.AppendPathSegment("realms")
-                .AppendPathSegment(tenant)
-                .AppendPathSegment("protocol")
-                .AppendPathSegment("openid-connect")
-                .AppendPathSegment("token");
-
-            var requestData = new FormUrlEncodedContent(
-            [
-                new KeyValuePair<string, string>("grant_type", "password"),
-                new KeyValuePair<string, string>("client_id", _tokenCredentials.Client_Id),
-                new KeyValuePair<string, string>("client_secret", _tokenCredentials.Client_Secret),
-                new KeyValuePair<string, string>("username", user.Username!),
-                new KeyValuePair<string, string>("password", user.Password!)                
-            ]);
-
-            var response = await _httpClient.PostAsync(urlGetToken, requestData);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                var result = JsonConvert.DeserializeObject<TokenDetails>(content);
-                return Result<TokenDetails>.Success(result!);
-            }
-
-            var responseMessage = await response.Content.ReadAsStringAsync();
-            UserErrors.SetTechnicalMessage(responseMessage);
-            return Result<TokenDetails>.Failure(UserErrors.InvalidUserNameOrPasswordError);
-        }
+        }       
 
         private void SetBaseUrlUserAction(string tenant)
         {

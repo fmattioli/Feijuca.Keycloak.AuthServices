@@ -5,5 +5,5 @@ using TokenManager.Domain.Entities;
 
 namespace TokenManager.Application.Services.Commands.Users
 {
-    public record LoginUserCommand(string Tenant, LoginUserRequest LoginUser) : IRequest<Result<TokenResponse>>;
+    public record LoginUserCommand(string Tenant, LoginUserRequest LoginUser) : IRequest<ResponseResult<TokenDetailsResponse>>;
 }

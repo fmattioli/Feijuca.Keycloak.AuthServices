@@ -39,23 +39,23 @@ namespace TokenManager.UnitTests.Handlers
                 .Should()
                 .Be(true);
 
-            resultHandle.Value.AccessToken
+            resultHandle.Result.AccessToken
                 .Should()
                 .Be(tokenDetails.Access_Token);
 
-            resultHandle.Value.ExpiresIn
+            resultHandle.Result.ExpiresIn
                 .Should()
                 .Be(tokenDetails.Expires_In);
 
-            resultHandle.Value.RefreshExpiresIn
+            resultHandle.Result.RefreshExpiresIn
                 .Should()
                 .Be(tokenDetails.Refresh_Expires_In);
 
-            resultHandle.Value.RefreshToken
+            resultHandle.Result.RefreshToken
                 .Should()
                 .Be(tokenDetails.Refresh_Token);
 
-            resultHandle.Value.TokenType
+            resultHandle.Result.TokenType
                 .Should()
                 .Be(tokenDetails.Token_Type);
         }

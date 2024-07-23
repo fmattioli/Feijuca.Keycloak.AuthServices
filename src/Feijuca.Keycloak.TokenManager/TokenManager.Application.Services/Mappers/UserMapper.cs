@@ -11,23 +11,24 @@ namespace TokenManager.Application.Services.Mappers
             return new User(userRequest.Username!, userRequest.Password, userRequest.Email!, userRequest.FirstName!, userRequest.LastName!, userRequest.Attributes);
         }
 
-
         public static User ToDomain(this LoginUserRequest loginUserRequest)
         {
             return new User(loginUserRequest.Username, loginUserRequest.Password);
         }
 
-        public static TokenResponse ToTokenResponse(this TokenDetails tokenDetails)
+        public static ResponseResult<TokenDetailsResponse> ToTokenResponse(this Result<TokenDetails> tokenDetails)
         {
-            return new TokenResponse
+            var tokenDetailsResponse = new TokenDetailsResponse
             {
-                AccessToken = tokenDetails.Access_Token,
-                ExpiresIn = tokenDetails.Expires_In,
-                RefreshToken = tokenDetails.Refresh_Token,
-                RefreshExpiresIn = tokenDetails.Refresh_Expires_In,
-                TokenType = tokenDetails.Token_Type,
-                Scope = tokenDetails.Scope
+                AccessToken = tokenDetails.Value.Access_Token,
+                ExpiresIn = tokenDetails.Value.Expires_In,
+                RefreshToken = tokenDetails.Value.Refresh_Token,
+                RefreshExpiresIn = tokenDetails.Value.Refresh_Expires_In,
+                TokenType = tokenDetails.Value.Token_Type,
+                Scopes = tokenDetails.Value.Scopes
             };
+
+            return ResponseResult<TokenDetailsResponse>.Success(tokenDetailsResponse);
         }
     }
 }

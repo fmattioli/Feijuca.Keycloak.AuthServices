@@ -2,7 +2,7 @@
 
 namespace TokenManager.Application.Services.Responses
 {
-    public class TokenResponse
+    public class TokenDetailsResponse
     {
         [JsonProperty("access_token")]
         public string? AccessToken { get; set; }
@@ -26,6 +26,6 @@ namespace TokenManager.Application.Services.Responses
         public string? SessionState { get; set; }
 
         [JsonProperty("scope")]
-        public string? Scope { get; set; }
+        public string? Scopes { get; set; }
     }
 }
