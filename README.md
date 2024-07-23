@@ -39,7 +39,7 @@ A [NuGet](https://www.nuget.org/packages/Feijuca.Keycloak.MultiTenancy) package 
         **This step is important and mandatory because on each request received the tool will validate the token audience.**
 
 - Your project configurations steps:
-   - 2. Appsettings.json
+   - 2. appsettings.json
         Filled out appsettings file on your application, relate all of yours realms (tenants)
       ```sh
       {
