@@ -41,11 +41,6 @@ namespace TokenManager.Application.Services.Responses
         {
             get
             {
-                if (!IsSuccess)
-                {
-                    throw new InvalidOperationException("No value available for failure result.");
-                }
-
                 return _result;
             }
         }

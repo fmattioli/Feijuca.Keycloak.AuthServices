@@ -119,7 +119,7 @@ namespace TokenManager.Infra.Data.Repositories
 
             var responseMessage = await response.Content.ReadAsStringAsync();
             UserErrors.SetTechnicalMessage(responseMessage);
-            return Result<TokenDetails>.Failure(UserErrors.InvalidUserNameOrPasswordError);
+            return Result<TokenDetails>.Failure(UserErrors.InvalidRefreshToken);
         }
 
         public async Task<(bool result, string content)> CreateNewUserAsync(string tenant, User user)

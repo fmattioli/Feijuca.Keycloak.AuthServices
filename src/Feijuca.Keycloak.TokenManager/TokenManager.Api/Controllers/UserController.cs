@@ -67,9 +67,9 @@ namespace TokenManager.Api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> RefreshToken([FromRoute] string tenant, [FromBody] string refreshToken, CancellationToken cancellationToken)
+        public async Task<IActionResult> RefreshToken([FromRoute] string tenant, [FromBody] RefreshTokenRequest request, CancellationToken cancellationToken)
         {
-            var result = await _mediator.Send(new RefreshTokenCommand(tenant, refreshToken), cancellationToken);
+            var result = await _mediator.Send(new RefreshTokenCommand(tenant, request.RefreshToken), cancellationToken);
 
             if (result.IsSuccess)
             {

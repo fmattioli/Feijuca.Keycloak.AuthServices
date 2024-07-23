@@ -12,7 +12,12 @@ namespace TokenManager.Application.Services.Commands.Users
         public async Task<ResponseResult<TokenDetailsResponse>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
             var tokeDetails = await _userRepository.RefreshTokenAsync(request.Tenant, request.RefreshToken);
-            return tokeDetails.ToTokenResponse();
+            if (tokeDetails.IsSuccess)
+            {
+                return tokeDetails.ToTokenResponse();
+            }
+
+            return ResponseResult<TokenDetailsResponse>.Failure(tokeDetails.Error);
         }
     }
 }

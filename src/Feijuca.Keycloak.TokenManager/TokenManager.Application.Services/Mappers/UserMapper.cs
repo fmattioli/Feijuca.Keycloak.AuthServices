@@ -7,7 +7,7 @@ namespace TokenManager.Application.Services.Mappers
     public static class UserMapper
     {
         public static User ToDomain(this AddUserRequest userRequest)
-        {            
+        {
             return new User(userRequest.Username!, userRequest.Password, userRequest.Email!, userRequest.FirstName!, userRequest.LastName!, userRequest.Attributes);
         }
 

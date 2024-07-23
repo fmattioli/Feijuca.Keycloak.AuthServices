@@ -15,6 +15,11 @@ namespace TokenManager.Domain.Errors
             "User.InvalidUserNameOrPassword",
             $"An error occurred while trying to get JWT token. Please check username and password. {TechnicalMessage}"
         );
+        
+        public static Error InvalidRefreshToken => new(
+            "User.InvalidRefreshTokenProvided",
+            $"An error occurred while trying to refresh token. {TechnicalMessage}"
+        );
 
         public static Error WrongPasswordDefinition => new(
             "User.WrongPasswordDefinition",
