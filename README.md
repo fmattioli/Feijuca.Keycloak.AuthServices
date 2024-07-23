@@ -36,7 +36,7 @@ A [NuGet](https://www.nuget.org/packages/Feijuca.Keycloak.MultiTenancy) package 
    - 1. **Configuring audience**:
         Create a new audience related to the scopes used your client and include the audience on your client:
         ![image](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/assets/27566574/6b7b437e-fa29-4776-b29f-4dba8e6d1f21)
-        **This step is important and mandatory because on each request received the tool will confirm the token audience**
+        **This step is important and mandatory because on each request received the tool will validate the token audience.**
 
 - Your project configurations steps:
    - 2. Appsettings.json
