@@ -2,8 +2,7 @@
 
 [![MIT License][license-shield]][license-url]
 
-### Built With
-<img src="https://img.shields.io/badge/dotnet8-blue" />
+### Built with: <img src="https://img.shields.io/badge/dotnet8-blue" />
 
 ### Prerequisites 📋
 This project was made with the purpose to attend only applications that follows the current [.Net Supported versions.](https://dotnet.microsoft.com/en-us/download/dotnet) 
