@@ -37,48 +37,48 @@ A [NuGet](https://www.nuget.org/packages/Feijuca.Keycloak.MultiTenancy) package 
         ![image](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/assets/27566574/6b7b437e-fa29-4776-b29f-4dba8e6d1f21)
         **This step is important and mandatory because on each request received the tool will validate the token audience.**
 
-- Your project configurations steps:
-   - 2. appsettings.json
+- Project configurations steps:
+   - 1. appsettings.json
         Filled out appsettings file on your application, relate all of yours realms (tenants)
-      ```sh
-      {
-         "AuthSettings": {
-            "Realms": [
-               {
-                  "Name": "yourTenantName1",
-                  "Audience": "your-audience-defined-on-step1",
-                  "Issuer": "https://url-keycloakt/realms/yourTenantName1"
-               },
-               {
-                  "Name": "yourTenantName2",
-                  "Audience": "your-audience-defined,
-                  "Issuer": "https://url-keycloakt/realms/yourTenantName2"
-               },
-               {
-                  "Name": "yourTenantName3",
-                  "Audience": "your-audience-defined",
-                  "Issuer": "https://url-keycloakt/realms/yourTenantName3"
-               }
-         ],
-         "ClientId": "your-client-id",
-         "ClientSecret": "your-client-secret",
-         "AuthServerUrl": "https://url-keycloak"
-         }
-      }
-      ```
+           ```sh
+           {
+              "AuthSettings": {
+                 "Realms": [
+                    {
+                       "Name": "yourTenantName1",
+                       "Audience": "your-audience-defined-on-step1",
+                       "Issuer": "https://url-keycloakt/realms/yourTenantName1"
+                    },
+                    {
+                       "Name": "yourTenantName2",
+                       "Audience": "your-audience-defined,
+                       "Issuer": "https://url-keycloakt/realms/yourTenantName2"
+                    },
+                    {
+                       "Name": "yourTenantName3",
+                       "Audience": "your-audience-defined",
+                       "Issuer": "https://url-keycloakt/realms/yourTenantName3"
+                    }
+              ],
+              "ClientId": "your-client-id",
+              "ClientSecret": "your-client-secret",
+              "AuthServerUrl": "https://url-keycloak"
+              }
+           }
+           ```
 
-- 3. Configure dependency
-     Map appsettings configurations values (Note that AuthSettings is a model defined on **Feijuca.Keycloak.Auth.MultiTenancy**, I recommend you use the GetSection method to map the appsettings configs to the AuthSettings model:
-      ```sh
-      var settings = configuration.GetSection("AuthSettings").Get<AuthSettings>();
-      ```
-   
-     Add the service to the service collection from your application, I recommend you create a new extension method as below:
+  - 2. Get appsettings values:
+       
+          Map appsettings configurations values (Note that AuthSettings is a model defined on **Feijuca.Keycloak.Auth.MultiTenancy**, I recommend you use the GetSection method to map the appsettings configs to the AuthSettings model:
   
+
+       ```sh
+       var settings = configuration.GetSection("AuthSettings").Get<AuthSettings>();
+       ```
+   - 3. Add dependency:
+        
+          Add the service to the service collection from your application, I recommend you create a new extension method as below:
       ```sh   
-      builder.Services
-       .AddApiAuthentication(applicationSettings.AuthSettings!);
-      
       public static class AuthExtension
        {
            public static IServiceCollection AddApiAuthentication(this IServiceCollection services, AuthSettings authSettings)
@@ -89,31 +89,15 @@ A [NuGet](https://www.nuget.org/packages/Feijuca.Keycloak.MultiTenancy) package 
    
                return services;
            }
-       }
+       }  
       ```
-- 4. Conclusion:
-   Following a default example, after generated, your token should have the following details:
-   Audience(s) related to the clients scopes:
-   
-    ![image](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/assets/27566574/18da7c8b-81f7-4bd7-b794-8eb768db9d18)
-   
-   And your appsettings should be:
-   ```sh   
-   "AuthSettings": {
-      "Realms": [
-        {
-          "Name": "10000",
-          "Audience": "receipts-commandhander-api",
-          "Issuer": "https://url-keycloak/realms/10000"
-        }
-      ],
-      "ClientId": "receipts-commandhander-api",
-      "Resource": "receipts-commandhander-api",
-      "AuthServerUrl": "https://url-keycloak",      
-    }
-   ```
-   With this configuration you should be able to use Keycloak following a multi tenancy contenxt using .NET.
-   Following this [link](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/blob/main/src/Feijuca.Keycloak.Auth.MultiTenancy/Feijuca.Keycloak.MultiTenancy/Extensions/AuthExtensions.cs) you can understand what is the logic used to validate the token received.
+      And after it, call it on your Program.cs:
+      ```sh   
+      builder.Services.AddApiAuthentication(applicationSettings.AuthSettings);      
+      ```
+  - 4. Conclusion:   
+        With this configuration you should be able to use Keycloak following a multi tenancy contenxt using .NET.
+        Following this [link](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/blob/main/src/Feijuca.Keycloak.Auth.MultiTenancy/Feijuca.Keycloak.MultiTenancy/Extensions/AuthExtensions.cs) you can understand what is the logic           used      to validate the token received.
   
 ## Feijuca.Keycloak.TokenManager 👨🏽‍💻
 Managing certain actions in the Keycloak API can be complicated. For example, creating a new user involves several steps: obtaining a token, creating the user, setting attributes, and setting a password. Feijuca.Keycloak.TokenManager aims to simplify these processes and abstract the complexity related to Keycloak API calls.
