@@ -29,10 +29,8 @@ It is a [NuGet](https://www.nuget.org/packages/Feijuca.Keycloak.MultiTenancy) pa
 With this package you can:
 
  - Use all Keycloak features following a multi-tenancy concept based on your realms, so you can handle different configurations based on each tenant (realm).
- - Get information from a token, such as finding out which tenant this tenant belongs to, which user this tenant belongs to, in this case also getting the UserName and UserId.
- - You can also get all the claims related to the token, just enter the name of the claim using the method
-
-
+ - Get information from a token, such as: finding claims, finding out which tenant this token belongs to, which user this token belongs to, and so on.
+   ([See more](src/Feijuca.Keycloak.Auth.MultiTenancy/Feijuca.Keycloak.MultiTenancy/Services/AuthService.cs))
  - **(If you want to implement a feature to retrieve something else related to the token, open a PR)**
 
 ## Getting Started on Feijuca.Keycloak.Auth.MultiTenancy
