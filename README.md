@@ -23,7 +23,7 @@ This repository aims to provide a configuration option for .NET projects that ar
  **Below, you can understand better the purpose about which one project. 👇**
  
 ## Feijuca.Keycloak.Auth.MultiTenancy 💻
-A [NuGet](https://www.nuget.org/packages/Feijuca.Keycloak.MultiTenancy) package that enables the implementation of multi-tenancy concepts using Keycloak. With this package, each realm acts as a different tenant, allowing for unique configurations for each one. This ensures that each tenant within your application can have its own settings and configurations within Keycloak.
+It is a [NuGet](https://www.nuget.org/packages/Feijuca.Keycloak.MultiTenancy) package that enables the implementation of multi-tenancy concepts using Keycloak. With this package, each realm acts as a different tenant, allowing for unique configurations for each one. This ensures that each tenant within your application can have its own settings and configurations within Keycloak.
 
 ### Features ⛲
 - You can use all existings keycloak features following a multi tenancy concept based on your realms, so you can handle different configurations based on each tenant (realm).
