@@ -68,7 +68,7 @@ A [NuGet](https://www.nuget.org/packages/Feijuca.Keycloak.MultiTenancy) package 
       ```
 
 - 3. Configure dependency
-      Map appsettings configurations values (Note that AuthSettings is a model defined on **Feijuca.Keycloak.Auth.MultiTenancy**, I recommend you use the GetSection method to map the appsettings configs to the AuthSettings model:
+     Map appsettings configurations values (Note that AuthSettings is a model defined on **Feijuca.Keycloak.Auth.MultiTenancy**, I recommend you use the GetSection method to map the appsettings configs to the AuthSettings model:
       ```sh
       var settings = configuration.GetSection("AuthSettings").Get<AuthSettings>();
       ```
