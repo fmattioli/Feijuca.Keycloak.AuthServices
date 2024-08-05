@@ -26,9 +26,14 @@ This repository aims to provide a configuration option for .NET projects that ar
 It is a [NuGet](https://www.nuget.org/packages/Feijuca.Keycloak.MultiTenancy) package that enables the implementation of multi-tenancy concepts using Keycloak. With this package, each realm acts as a different tenant, allowing for unique configurations for each one. This ensures that each tenant within your application can have its own settings and configurations within Keycloak.
 
 ### Features ⛲
-- You can use all existings keycloak features following a multi tenancy concept based on your realms, so you can handle different configurations based on each tenant (realm).
-- With just one instance from your application you can handle different tenants using the same JWT token generation config
-- Obtaining information such as a tenant, user id, url and so on from a token. (If you wanna implement a method do retrieve another thing related to the token, open a PR)
+With this package you can:
+
+ - Use all Keycloak features following a multi-tenancy concept based on your realms, so you can handle different configurations based on each tenant (realm).
+ - Get information from a token, such as finding out which tenant this tenant belongs to, which user this tenant belongs to, in this case also getting the UserName and UserId.
+ - You can also get all the claims related to the token, just enter the name of the claim using the method
+
+
+ - **(If you want to implement a feature to retrieve something else related to the token, open a PR)**
 
 ## Getting Started on Feijuca.Keycloak.Auth.MultiTenancy
 
