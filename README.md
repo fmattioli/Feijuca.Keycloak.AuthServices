@@ -102,9 +102,15 @@ With this package you can:
       ```sh   
       builder.Services.AddApiAuthentication(applicationSettings.AuthSettings);      
       ```
-  - 4. Conclusion:   
-        With this configuration you should be able to use Keycloak following a multi tenancy contenxt using .NET.
-        Following this [link](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/blob/main/src/Feijuca.Keycloak.Auth.MultiTenancy/Feijuca.Keycloak.MultiTenancy/Extensions/AuthExtensions.cs) you can understand what is the logic           used      to validate the token received.
+  - 4. Conclusion:
+       
+        Your configs should be like:
+       
+        ![image](https://github.com/user-attachments/assets/d26958e1-d842-4c31-a306-7a8968d1cb66)
+   
+        And with this configuration you should be able to use Keycloak following a multi tenancy contenxt using .NET.
+       
+        Following this [link](https://github.com/fmattioli/Feijuca.Keycloak.AuthServices/blob/main/src/Feijuca.Keycloak.Auth.MultiTenancy/Feijuca.Keycloak.MultiTenancy/Extensions/AuthExtensions.cs) you can understand what is the logic           used to validate the token received.
   
 ## Feijuca.Keycloak.TokenManager 👨🏽‍💻
 Managing certain actions in the Keycloak API can be complicated. For example, creating a new user involves several steps: obtaining a token, creating the user, setting attributes, and setting a password. Feijuca.Keycloak.TokenManager aims to simplify these processes and abstract the complexity related to Keycloak API calls.
